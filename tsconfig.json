@@ -18,10 +18,10 @@
         "forceConsistentCasingInFileNames": true,
         "baseUrl": ".",
         "paths": {
-            "@/*": ["./frontend/*"],
+            "@/*": ["./resources/js/*"],
             "ziggy-js": ["./vendor/tightenco/ziggy"],
         }
     },
-    "include": ["resources/js"],
+    "include": ["resources/js","resources/js/**/*"],
     "exclude": ["node_modules", "vendor", "public"]
 }
