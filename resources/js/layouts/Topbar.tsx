@@ -85,23 +85,23 @@ const profileMenus = [
 	{
 		label: 'My Account',
 		icon: 'ri-account-circle-line',
-		redirectTo: '/pages/profile',
+		redirectTo: '/profile',
 	},
 	{
 		label: 'Settings',
 		icon: 'ri-settings-4-line',
-		redirectTo: '/pages/profile',
+		redirectTo: '/profile',
 	},
-	{
-		label: 'Support',
-		icon: 'ri-customer-service-2-line',
-		redirectTo: '/pages/faq',
-	},
-	{
-		label: 'Lock Screen',
-		icon: 'ri-lock-password-line',
-		redirectTo: '/auth/lock-screen',
-	},
+	// {
+	// 	label: 'Support',
+	// 	icon: 'ri-customer-service-2-line',
+	// 	redirectTo: '/pages/faq',
+	// },
+	// {
+	// 	label: 'Lock Screen',
+	// 	icon: 'ri-lock-password-line',
+	// 	redirectTo: '/auth/lock-screen',
+	// },
 	{
 		label: 'Logout',
 		icon: 'ri-logout-box-line',

@@ -30,7 +30,7 @@ const BottomLink = () => {
         <div className="text-center my-4">
             <p className="text-muted">
                 Already have account?{' '}
-                <Link href="/auth/login" className="text-muted ms-1 link-offset-3 underline underline-offset-4">
+                <Link href="/login" className="text-muted ms-1 link-offset-3 underline underline-offset-4">
                     <b>Log In</b>
                 </Link>
             </p>

@@ -1,4 +1,4 @@
-import { useForm } from '@inertiajs/react';
+import { Link, useForm } from '@inertiajs/react';
 import { router } from '@inertiajs/react';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -15,9 +15,9 @@ const BottomLink = () => {
         <div className="text-center my-4">
             <p className="text-muted">
                 Don&apos;t have an account?&nbsp;
-                <a href="/register" className="text-muted ms-1 link-offset-3 underline underline-offset-4">
+                <Link href="/register" className="text-muted ms-1 link-offset-3 underline underline-offset-4">
                     <b>Sign Up</b>
-                </a>
+                </Link>
             </p>
         </div>
     );
@@ -25,9 +25,9 @@ const BottomLink = () => {
 
 const PasswordInputChild = () => {
     return (
-        <a href="/forgot-password" className="text-muted text-xs underline decoration-dashed underline-offset-4">
+        <Link href="/forgot-password" className="text-muted text-xs underline decoration-dashed underline-offset-4">
             Forgot your password?
-        </a>
+        </Link>
     );
 };
 
