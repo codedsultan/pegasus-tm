@@ -4,7 +4,7 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../redux/store'
 import { changeLayoutTheme, changeSideBarType, showRightSidebar } from '../redux/actions'
-
+import { usePage,useForm, Link } from '@inertiajs/react';
 // hooks
 import { useViewPort } from '../hooks'
 
@@ -118,6 +118,9 @@ function subtractHours(date: Date, minutes: number) {
 }
 
 const Topbar = () => {
+    // get from usepage props username="Tosha Minner"
+    const { auth } = usePage().props;
+    console.log(auth);
 	const dispatch = useDispatch<AppDispatch>()
 	const { width } = useViewPort()
 
@@ -258,7 +261,7 @@ const Topbar = () => {
 				</div>
 
 				<div className="relative">
-					<ProfileDropDown profiliePic={profilePic} menuItems={profileMenus} username="Tosha Minner" userTitle="Founder" />
+					<ProfileDropDown profiliePic={profilePic} menuItems={profileMenus} username={auth?.user.first_name} userTitle="Founder" />
 				</div>
 			</header>
 		</React.Fragment>
