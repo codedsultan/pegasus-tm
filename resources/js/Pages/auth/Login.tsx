@@ -1,19 +1,11 @@
-import { useEffect } from 'react';
-// import { Inertia } from '@inertiajs/inertia';
-// import { Inertia } from '@inertia/inertia'
-import { router } from '@inertiajs/react';
 import { useForm } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 import AuthLayout from '../../components/AuthPageLayout/AuthLayout';
 import AuthContainer from '../../components/AuthPageLayout/AuthContainer';
 import VerticalForm from '../../components/VerticalForm';
 import FormInput from '../../components/FormInput';
-import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
-
-interface UserData {
-    username: string;
-    password: string;
-}
 
 /**
  * Bottom Links component
@@ -40,7 +32,7 @@ const PasswordInputChild = () => {
 };
 
 const Login = ({ errors }: { errors: Record<string, string> }) => {
-    const { data, setData, post, processing } = useForm<UserData>({
+    const { data, setData, post, processing } = useForm({
         username: '',
         password: '',
     });
@@ -58,13 +50,19 @@ const Login = ({ errors }: { errors: Record<string, string> }) => {
     /*
       handle form submission
     */
-    const onSubmit = (formData: any) => {
+    const onSubmit = () => {
         post('/login', {
-            data: formData,
-            onSuccess: () => {
-                const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/';
-                router.visit(redirectUrl);
+            data: {
+                username: data.username,
+                password: data.password,
             },
+            onSuccess: () => {
+                const redirectUrl = new URLSearchParams(window.location.search).get('redirect') || '/dashboard';
+                router.visit(redirectUrl); // Redirect to the desired page after login
+            },
+            onError: (errors) => {
+                console.log(errors); // Optional: Log errors for debugging
+            }
         });
     };
 
@@ -75,7 +73,7 @@ const Login = ({ errors }: { errors: Record<string, string> }) => {
                 helpText="Enter your email address and password to access the admin panel."
                 bottomLinks={<BottomLink />}
             >
-                <VerticalForm<UserData>
+                <VerticalForm
                     onSubmit={onSubmit}
                     resolver={schemaResolver}
                     defaultValues={{
@@ -94,7 +92,7 @@ const Login = ({ errors }: { errors: Record<string, string> }) => {
                         containerClass="mb-6 space-y-2"
                         labelClassName="font-semibold text-gray-500"
                         required
-                        // error={errors.username}
+                        errors={errors.username}
                     />
 
                     <FormInput
@@ -109,7 +107,7 @@ const Login = ({ errors }: { errors: Record<string, string> }) => {
                         labelClassName="font-semibold text-gray-500"
                         labelContainerClassName="flex justify-between items-center mb-2"
                         required
-                        // errors={errors.password}
+                        errors={errors.password}
                     >
                         <PasswordInputChild />
                     </FormInput>

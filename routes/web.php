@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PasswordController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -7,6 +11,11 @@ use Inertia\Inertia;
 //     return view('welcome');
 // });
 
+Route::get('/home', function () {
+    return Inertia::render('Home', [
+        'message' => 'Hello from Laravel!',
+    ]);
+});
 
 Route::get('/', function () {
     return Inertia::render('Home', [
@@ -19,13 +28,18 @@ Route::get('/login', function () {
     return Inertia::render('auth/Login', [
         'message' => 'Hello from Laravel!',
     ]);
-});
+})->name('login');
+
+Route::post('/login', [AuthController::class,'login'])->name('login');
 
 Route::get('/register', function () {
     return Inertia::render('auth/Register', [
         'message' => 'Hello from Laravel!',
     ]);
 });
+
+Route::post('/register', [AuthController::class,'register'])->name('register');
+
 
 Route::get('/lock-screen', function () {
     return Inertia::render('auth/LockScreen', [
@@ -39,14 +53,66 @@ Route::get('/confirm-mail', function () {
     ]);
 });
 
+Route::get('/forgot-password', function () {
+    return Inertia::render('auth/RecoverPassword', [
+        'message' => 'Hello from Laravel!',
+    ]);
+});
+
 Route::get('/recover-password', function () {
     return Inertia::render('auth/RecoverPassword', [
         'message' => 'Hello from Laravel!',
     ]);
 });
+// forgot-password
 
 Route::get('/logout', function () {
     return Inertia::render('auth/Logout', [
         'message' => 'Hello from Laravel!',
     ]);
 });
+// Route::get('/email/verify', function () {
+//     return inertia('Auth/VerifyEmail');
+// })->middleware('auth')->name('verification.notice');
+Route::get('/email/verify', function () {
+    return inertia('auth/VerifyEmail');
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return redirect('/dashboard');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/resend', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('status', 'verification-link-sent');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+
+Route::middleware(['auth', 'verified'])->group(function () {
+
+    Route::get('/dashboard', function () {
+        return Inertia::render('dashboard/Analytics/index', [
+            'message' => 'Hello from Laravel!',
+        ]);
+    });
+});
+
+// use App\Http\Controllers\PasswordController;
+
+Route::post('forgot-password', [PasswordController::class, 'sendResetLink'])
+    ->name('password.email');
+
+Route::get('reset-password/{token}', [PasswordController::class, 'showResetForm'])
+    ->name('password.reset');
+
+Route::post('reset-password', [PasswordController::class, 'resetPassword'])
+    ->name('password.update');
+// use Illuminate\Support\Facades\Password;
+
+// Route::post('/forgot-password', [PasswordController::class, 'sendResetLink'])->name('password.email');
+// Route::post('/reset-password', [PasswordController::class, 'reset'])->name('password.update');
+
+Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
+
+
