@@ -116,3 +116,14 @@ Route::post('reset-password', [PasswordController::class, 'resetPassword'])
 Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
 
 
+Route::get('/profile', function () {
+    return Inertia::render('other/Profile/index', [
+        'message' => 'Hello from Laravel!',
+    ]);
+});
+
+Route::get('/starter', function () {
+    return Inertia::render('other/Starter', [
+        'message' => 'Hello from Laravel!',
+    ]);
+});

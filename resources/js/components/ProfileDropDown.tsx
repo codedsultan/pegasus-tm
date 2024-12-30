@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import PopoverLayout from './HeadlessUI/PopoverLayout'
 import { useForm } from '@inertiajs/react';
 
@@ -12,19 +12,19 @@ interface ProfileMenuItem {
 interface ProfileDropDownProps {
 	menuItems: Array<ProfileMenuItem>
 	profiliePic?: string
-	username: string
+	username?: string
 	userTitle?: string
 }
 
 const ProfileDropDown = (props: ProfileDropDownProps) => {
 	const profilePic = props.profiliePic
-
+    const { auth } = usePage().props;
 	const PopoverToggler = () => {
 		return (
 			<>
 				<img src={profilePic} alt="user-image" className="rounded-full h-8" />
 				<span className="md:flex flex-col gap-0.5 text-start hidden">
-					<h5 className="text-sm">Tosha Minner</h5>
+					<h5 className="text-sm">{auth?.user.first_name + ' ' + auth?.user.last_name}</h5>
 					<span className="text-xs">Founder</span>
 				</span>
 			</>
@@ -70,7 +70,7 @@ const ProfileDropDown = (props: ProfileDropDownProps) => {
                 toggler={<PopoverToggler />}
             >
                 <div className="mt-1 end-0 absolute w-44 z-50 transition-all duration-300 bg-white shadow-lg border rounded-lg py-2 border-gray-200 dark:border-gray-700 dark:bg-gray-800">
-                <h6 className="flex items-center py-2 px-3 text-xs text-gray-800 dark:text-gray-400">Welcome !</h6>
+                <h6 className="flex items-center py-2 px-3 text-xs text-gray-800 dark:text-gray-400">Welcome {auth?.user.first_name}!</h6>
 
                 {(props.menuItems || []).map((item, idx) => {
                     if (item.label === 'Logout') {

@@ -9,7 +9,7 @@ declare module '@inertiajs/core' {
     auth?: {
       user: {
         id: number;
-        // name: string;
+        name: string;
         email: string;
         first_name: string;
         last_name: string;

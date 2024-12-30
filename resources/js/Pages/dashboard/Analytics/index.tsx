@@ -35,7 +35,7 @@ const { layoutTheme, layoutDirection, layoutWidth, topBarTheme, sideBarTheme, si
 }
 const Analytics = () => {
     const props: any = {
-        title: 'Attex React',
+        title: 'Dasboard',
         description: 'Attex React is a free and open-source admin dashboard template built with React and Tailwind CSS. It is designed to be easily customizable and includes a wide range of features and components to help you build your own dashboard quickly and efficiently.',
     }
 
@@ -51,7 +51,7 @@ const Analytics = () => {
 	return (
 		<>
             <VerticalLayout {...props}>
-                <PageBreadcrumb title="Analytics" subName="Menu" />
+                {/* <PageBreadcrumb title="Analytics" subName="Menu" /> */}
 
                 <div className="grid xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 gap-6 mb-6">
                     <Statistics />
