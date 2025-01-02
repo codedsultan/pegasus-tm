@@ -579,7 +579,7 @@ const KanbanApp = () => {
                             <div className="flex justify-between items-center py-2.5 px-4 border-b dark:border-gray-700 pt-8">
                                 <h3 className="font-medium text-gray-800 dark:text-white text-lg">
                                     {task?.title}
-                                    <span className="inline-flex items-center gap-1.5 p-1 rounded-md text-xs font-medium bg-danger text-white ms-3">High</span>
+                                    <span className={`inline-flex items-center gap-1.5 p-1 rounded-md text-xs font-medium ms-3 ${task?.priority === 'High' ? 'bg-danger/10 text-danger' : task?.priority === 'Medium' ? 'bg-warning/10 text-warning' : task?.priority === 'Low' ? 'bg-success/10 text-success' : ''}`}>{task?.priority}</span>
                                 </h3>
 
                                 <button className="inline-flex flex-shrink-0 justify-center items-center h-8 w-8 dark:text-gray-200" onClick={() =>toggleDescriptionModal(task)} type="button">
