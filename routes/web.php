@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\TaskController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -127,3 +128,20 @@ Route::get('/starter', function () {
         'message' => 'Hello from Laravel!',
     ]);
 });
+
+
+Route::get('/boards',[TaskController::class, 'index'])->name('boards.index');
+Route::post('/boards/update-tasks', [TaskController::class, 'updateTasks'])->name('boards.update-tasks');
+
+// Task Routes
+// Route::get('/items', [TaskController::class, 'index'])->name('items.index');
+// Route::get('/items/create', [TaskController::class, 'create'])->name('items.create');
+// Route::post('/items', [TaskController::class, 'store'])->name('items.store');
+// Route::get('/items/{item}/edit', [TaskController::class, 'edit'])->name('items.edit');
+// Route::put('/items/{item}', [TaskController::class, 'update'])->name('items.update');
+// Route::delete('/items/{item}', [TaskController::class, 'destroy'])->name('items.destroy');
+
+
+Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+Route::patch('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
