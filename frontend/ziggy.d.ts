@@ -24,6 +24,8 @@ declare module 'ziggy-js' {
     ],
     "password.update": [],
     "logout": [],
+    "boards.index": [],
+    "boards.update-tasks": [],
     "tasks.index": [],
     "tasks.store": [],
     "tasks.update": [
