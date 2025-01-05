@@ -16,7 +16,7 @@ const TaskItem = ({ task, toggleDescriptionModal }: TaskItemProps) => {
 					<small>{task.dueDate}</small>
 					<span
 						className={`inline-flex items-center gap-1.5 px-1 rounded-md text-xs font-medium
-          ${task.priority === 'High' ? 'bg-danger/10 text-danger' : task.priority === 'Medium' ? 'bg-warning/10 text-warning' : task.priority === 'Low' ? 'bg-success/10 text-success' : ''}`}
+                        ${task.priority === 'High' ? 'bg-danger/10 text-danger' : task.priority === 'Medium' ? 'bg-warning/10 text-warning' : task.priority === 'Low' ? 'bg-success/10 text-success' : ''}`}
 					>
 						{task.priority}
 					</span>
