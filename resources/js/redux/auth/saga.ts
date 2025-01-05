@@ -2,10 +2,10 @@ import { all, fork, put, takeEvery, call } from 'redux-saga/effects'
 import { SagaIterator } from '@redux-saga/core'
 
 // apicore
-import { APICore, setAuthorization } from '../../helpers/api/apiCore'
+import { APICore, setAuthorization } from '../../Helpers/api/apiCore'
 
 // helpers
-import { login as loginApi, logout as logoutApi, signup as signupApi, forgotPassword as forgotPasswordApi } from '../../helpers/api/auth'
+import { login as loginApi, logout as logoutApi, signup as signupApi, forgotPassword as forgotPasswordApi } from '../../Helpers/api/auth'
 
 // actions
 import { authApiResponseSuccess, authApiResponseError } from './actions'
