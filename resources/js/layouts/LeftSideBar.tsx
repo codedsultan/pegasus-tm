@@ -3,7 +3,7 @@ import React, { useRef } from 'react'
 // assets
 import SimpleBar from 'simplebar-react'
 import AppMenu from './Menu'
-import { getMenuItems } from '../helpers/menu'
+import { getMenuItems } from '../Helpers/menu'
 import LogoBox from '../components/LogoBox'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '../redux/store'
