@@ -1,7 +1,7 @@
 import { useEffect, useState ,useCallback} from 'react'
 import { Head, Link, usePage } from '@inertiajs/react';
 
-import { TaskTypes ,AssigneeTypes} from './data'
+import { TaskTypes ,AssigneeTypes, UserTypes} from './data'
 import { DragDropContext, Draggable, DropResult, Droppable } from 'react-beautiful-dnd'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -59,7 +59,7 @@ const KanbanApp = () => {
     });
 
     const tasks = props.tasks as TaskTypes[];
-    const assignees = props.assignees as AssigneeTypes[];
+    const assignees = props.assignees as UserTypes[];
 
     // order tasks by order
 	const [state, setState] = useState<StateType>({
@@ -174,28 +174,39 @@ const KanbanApp = () => {
 	/**
 	 * Toggles the description modal
 	 */
-    // const taskId = props.task?.id;
-    // const task: any = props.task;
+
     const { task } = usePage<{ task: TaskTypes | null }>().props;
     const currentUrl = new URL(window.location.href);
-    var isCurrentTask: boolean = currentUrl.searchParams.get('task')?.toString() === task?.id?.toString() && currentUrl.searchParams.get('task')?.toString() !== undefined;
+    var isCurrentTask: boolean = currentUrl.searchParams.get('task')?.toString() === task?.id?.toString() && currentUrl.searchParams.get('task')?.toString() !== undefined && currentUrl.searchParams.get('update')?.toString() === undefined;
+    var isCurrentUpdateTask: boolean = currentUrl.searchParams.get('update')?.toString() === task?.id?.toString() && currentUrl.searchParams.get('update')?.toString() !== undefined;
 
     console.log('is current task ::' + isCurrentTask + 'searchParams ::' + currentUrl.searchParams.get('task')?.toString() + 'Task id::' + task?.id?.toString());
     // const [isOpen, setIsOpen] = useState(isCurrenTask);
-    const [currentTask, setCurrentTask] = useState(null);
-    // const [isModalOpen, setIsModalOpen] = useState(isCurrentTask);
-    // const [isOpen, setIsOpen] = useState(isCurrentTask);
-    // const [descriptionModal, setDescriptionModal] = useState(true);
+    // const [currentTask, setCurrentTask] = useState(null);
+
     const [descriptionModal, setDescriptionModal] = useState<boolean>(isCurrentTask)
     const [updateTaskModal, setUpdateTaskModal] = useState<boolean>(false)
 
-    const updateTaskForm = useForm({
+    interface TaskFormData {
+        title?: string;
+        description?: string;
+        assignees: string[];
+        assignTo?: string;
+        dueDate?: Date;
+        status?: string;
+        priority?: string;
+
+        // Define 'assignees' as an array of strings
+    }
+
+    const updateTaskForm = useForm<TaskFormData>({
         title: '',
         priority: '',
         description: '',
         assignTo: '',
         dueDate: new Date(),
         status: '',
+        assignees: [],
     });
 
     const handleUpdateTaskDate = (date: Date) => {
@@ -203,20 +214,26 @@ const KanbanApp = () => {
 	};
 
     const toggleUpdateTaskModal = (task:any) => {
-
-        console.log('in handleUpdateTask ::' + 'task :' + updateTaskForm?.data?.title);
+        updateTaskForm.clearErrors();
+        // console.log('in handleUpdateTask ::' + 'task :' + updateTaskForm?.data?.title);
+        // setCurrentTask(task);
+        // setDescriptionModal(false);
         setUpdateTaskModal((prevState) => {
             const newState = !prevState;
             // console.log('in toggleUpdateTaskModal :: state:', newState); // Correctly log the new state
             return newState;
         });
 
+
         router.get(
             route('boards.index'),
-            { task: task?.id },
+            !updateTaskModal ? { task: task?.id , update: task?.id } : { task: null , update: null },
             {
               onSuccess: () => {
-                isCurrentTask = currentUrl.searchParams.get('task')?.toString() === task?.id?.toString();
+                // isCurrentUpdateTask = currentUrl.searchParams.get('update')?.toString() !== undefined;
+                // isCurrentTask = false;
+                // currentUrl.searchParams.get('task')?.toString() === task?.id?.toString() && currentUrl.searchParams.get('task')?.toString() !== undefined && currentUrl.searchParams.get('task')?.toString() !== null;
+
 
                 updateTaskForm.setData({
                     title: task?.title,
@@ -225,51 +242,51 @@ const KanbanApp = () => {
                     assignTo: task?.assignedTo,
                     dueDate: new Date(task?.due_date),
                     status: task?.status,
+                    assignees: task?.assignee_ids,
                 });
+
+
               },
               preserveState: true,
               preserveScroll: true,
-              only: ['task','assignees'],
+              only: ['task','tasks'],
             }
           );
 
-    };
+    }
 
 
+    // isCurrentUpdateTask && toggleUpdateTaskModal(task);
     const handleUpdateTask = (e: React.FormEvent) => {
+
+
         e.preventDefault();
+
+
         console.log('in handleUpdateTask ::' + 'task :' + task);
         // Include the status and queue from the current modal details
         // setData('status', task?.status);
 
-        updateTaskForm.post(route('boards.task.update'), {
+        updateTaskForm.put(route('boards.task.update',{id:task?.id,update:task?.id}), {
             preserveScroll: true,
+            preserveState: true,
             onSuccess: () => {
-                // Add the new task to the correct state queue
-                // const modifiedState: any = { ...state };
-                // const tasks = [...getList(newTaskDetails.queue), newTask];
-                // modifiedState[newTaskDetails.queue] = [...tasks];
-                // setState(modifiedState);
-
-                // Close the modal and reset the form
-                // reset();
-                // setNewTaskModal(false);
-                // setTotalTasks(totalTasks + 1);
+                refreshTaskList();
+            },
+            onError: (error) => {
+                // setUpdateTaskModal(true);
+                console.log('in handleUpdateTask ::' + 'error :' + error);
             },
         });
     };
 	const toggleDescriptionModal = useCallback((task:any) => {
-        setCurrentTask(task);
-        setDescriptionModal((prevState) => {
-            const newState = !prevState;
-            console.log('in toggleDescriptionModal :: state:', newState); // Correctly log the new state
-            return newState;
-        });
-        // setDescriptionModal((prevState) =>  !prevState);
-        // console.log('in toggleDescriptionModal ::' + 'state :' + descriptionModal);
+        updateTaskForm.clearErrors();
+            setDescriptionModal((prevState) => {
+                const newState = !prevState;
+                console.log('in toggleDescriptionModal :: state:', newState); // Correctly log the new state
+                return newState;
+            });
 
-        // // (open: boolean) => {
-        // if(task.id === currentTask?.id)
             router.get(
               route('boards.index'),
               !descriptionModal ? { task: task?.id } : { task: null },
@@ -277,15 +294,15 @@ const KanbanApp = () => {
                 onSuccess: () => {
                   console.log('in toggleDescriptionModal ::' + 'onSuccess');
                   isCurrentTask = currentUrl.searchParams.get('task')?.toString() === task?.id?.toString();
+
                 //   setDescriptionModal((prevState) => !prevState)
                 },
                 preserveState: true,
                 preserveScroll: true,
-                only: ['task'],
+                only: ['task','assignees'],
               }
             );
-        //   },
-        //   [jobUid, applicationUid]
+
         console.log('in toggleDescriptionModal ::' + 'after state :' + descriptionModal);
 
 
@@ -295,6 +312,7 @@ const KanbanApp = () => {
     useEffect(() => {
         setDescriptionModal(isCurrentTask);
     }, [isCurrentTask]);
+
 	/**
 	 * Creates new empty task with given status
 	 * @param status
@@ -406,66 +424,31 @@ const KanbanApp = () => {
         console.log('in persist changes about to call ::' + 'source id:' + tempData.sourceId + ' destination id:' + tempData.destinationId);
         router.post('/boards/update-tasks', tempData)
 
-        // updateTasks.post('/boards/update-tasks', {
-        //         preserveScroll: true,
-        //         onSuccess: () => {
-        //             // Add the new task to the correct state queue
-        //             // const modifiedState: any = { ...state };
-        //             // const tasks = [...getList(newTaskDetails.queue), newTask];
-        //             // modifiedState[newTaskDetails.queue] = [...tasks];
-        //             // setState(modifiedState);
-
-        //             // Close the modal and reset the form
-        //             // reset();
-        //             // setNewTaskModal(false);
-        //             // setTotalTasks(totalTasks + 1);
-        //         },
-        //     });
-            // await axios.post('/kanban/update-tasks', payload);
-        //     console.log('Changes persisted successfully!');
-        // } catch (error) {
-        //     console.error('Error persisting changes:', error);
-        // }
     };
 
 	/**
 	 * Handles the new task form submission
 	 */
-	// const handleNewTask = (values: any) => {
-	// 	const formData = {
-	// 		category: values.category,
-	// 		title: values.title,
-	// 		priority: values.priority,
-	// 		description: values.description,
-	// 		userAvatar: [JSON.parse(values.assignTo)],
-	// 	}
 
-	// 	const newTask = {
-	// 		...newTaskDetails,
-	// 		...formData,
-	// 		id: totalTasks + 1,
-	// 		comments: 35,
-	// 		dueDate: newTaskDetails.dueDate.toLocaleDateString('en-US', {
-	// 			year: 'numeric',
-	// 			month: 'short',
-	// 			day: 'numeric',
-	// 		}),
-	// 	}
-	// 	const modifiedState: any = { ...state }
-	// 	const tasks = [...getList(newTaskDetails.queue), newTask]
-	// 	modifiedState[newTaskDetails.queue] = [...tasks]
-	// 	setState(modifiedState)
-	// 	setNewTaskModal(false)
-	// 	setTotalTasks(totalTasks + 1)
+	const deleteTask = (taskId:any) => {
+            router.delete(route('boards.task.delete',{id:taskId}), {
+                preserveScroll: true,
+                onSuccess: () => {
+                    console.log('in deleteTask ::' + 'onSuccess');
+                    refreshTaskList();
+                },
+            });
+      };
 
-	// 	// reset the form after submission
-	// 	// reset()
-	// }
-
+      const refreshTaskList = () => {
+        router.visit(route('boards.index',{ task: task?.id }), {
+            only: ['tasks','task'],
+        })
+      };
 	return (
 		<>
             <VerticalLayout {...props}>
-                <PageBreadcrumb title="Kanban" subName="Apps" addedChild={<BreadcrumbChild />} />
+                {/* <PageBreadcrumb title={usePage().props.title} addedChild={<BreadcrumbChild />} /> */}
                 <div className="grid w-full">
                     <div className="overflow-hidden text-gray-700 dark:text-slate-400">
                         <DragDropContext onDragEnd={onDragEnd}>
@@ -605,7 +588,7 @@ const KanbanApp = () => {
                                         <FormInput name="assignTo" label="Assign To" type="select" containerClass="space-y-1.5 mb-6" labelClassName="font-semibold text-gray-500" className="form-select" key="assignTo" value={data.assignTo} errors={errors} onChange={(e) => setData('assignTo', e.target.value)}>
                                             {(assignees || []).map((assignee, idx) => (
                                                 <option key={idx} value={assignee.id}>
-                                                    {assignee.title}
+                                                    {assignee.fullname}
                                                 </option>
                                             ))}
                                         </FormInput>
@@ -659,19 +642,14 @@ const KanbanApp = () => {
                                     <button type="button" onClick={() => toggleUpdateTaskModal(task)} className="btn btn-link text-xl">
                                         <i className="ri-edit-line"></i>
                                     </button>
-                                    <button type="button" onClick={() => toggleDescriptionModal(task)} className="btn btn-link text-xl">
+                                    <button type="button" onClick={() => deleteTask(task?.id)} className="btn btn-link text-xl">
                                         <i className="ri-delete-bin-line"></i>
                                     </button>
                                     <button type="button" onClick={() => toggleDescriptionModal(task)} className="btn btn-link text-xl">
                                         <i className="ri-archive-drawer-fill"></i>
                                     </button>
 
-                                    {/* <button
-                                        type="button"
-                                        onClick={() => toggleDescriptionModal(task)}
-                                        className="btn btn-link text-xl"
-                                        Edit
-                                    </button> */}
+
                                 </div>
                                 <button className="inline-flex flex-shrink-0 justify-center items-center h-8 w-8 dark:text-gray-200" onClick={() =>toggleDescriptionModal(task)} type="button">
                                     <i className="ri-close-line text-xl"></i>
@@ -891,12 +869,6 @@ const KanbanApp = () => {
                                         <i className="ri-archive-drawer-fill"></i>
                                     </button>
 
-                                    {/* <button
-                                        type="button"
-                                        onClick={() => toggleDescriptionModal(task)}
-                                        className="btn btn-link text-xl"
-                                        Edit
-                                    </button> */}
                                 </div>
                                 <button
                                     className="inline-flex flex-shrink-0 justify-center items-center h-8 w-8 dark:text-gray-200"
@@ -939,7 +911,7 @@ const KanbanApp = () => {
                                             <CustomDatepicker
                                                 hideAddon
                                                 dateFormat="yyyy-MM-dd"
-                                                value={updateTaskForm?.data.dueDate}
+                                                value={updateTaskForm?.data.dueDate || new Date()}
                                                 inputClass="form-input"
                                                 onChange={(date) => {
                                                     handleUpdateTaskDate(date)
@@ -947,11 +919,6 @@ const KanbanApp = () => {
                                             />
                                         </div>
                                     </div>
-
-                                    {/* <div>
-
-                                        <FormInput name="dueDate" label="Due Date" type="date" containerClass="space-y-1.5 mb-6" className="form-input" key="dueDate" value={updateTaskForm?.data.dueDate} errors={updateTaskForm?.errors} onChange={(e) => updateTaskForm.setData('dueDate', e.target.value)} />
-                                    </div> */}
                                 </div>
 
                                 {/* Assignee */}
@@ -959,11 +926,36 @@ const KanbanApp = () => {
                                     <FormInput name="assignTo" label="Assign To" type="select" containerClass="space-y-1.5 mb-6" labelClassName="font-semibold text-gray-500" className="form-select" key="assignTo" value={updateTaskForm?.data.assignTo} errors={errors} onChange={(e) => updateTaskForm.setData('assignTo', e.target.value)}>
                                         {(assignees || []).map((assignee, idx) => (
                                             <option key={idx} value={assignee.id}>
-                                                {assignee.title}
+                                                {assignee.fullname}
                                             </option>
                                         ))}
                                     </FormInput>
                                 </div>
+
+                                {/* <div className="mb-4">
+                                    <label htmlFor="task-assignees" className="block mb-2 text-sm font-medium text-gray-600">
+                                        Assignees
+                                    </label>
+                                    <select
+                                        id="task-assignees"
+                                        className="form-select w-full"
+                                        multiple
+                                        defaultValue={task?.assignee_ids || []}
+                                        onChange={(e) => {
+                                            const selectedValues = Array.from(e.target.selectedOptions).map((option) => option.value);
+                                            updateTaskForm.setData('assignees', selectedValues);
+                                        }}
+                                    >
+
+                                        {(assignees || []).map((user) => (
+                                        <option key={user.id} value={user.id}>
+                                            {user.name}
+                                        </option>
+                                        ))}
+                                    </select>
+                                    <p className="text-xs text-gray-500 mt-1">Hold Ctrl (Cmd on Mac) to select multiple users.</p>
+                                </div> */}
+
 
                                 {/* Submit Button */}
                                 <div className="flex justify-end">

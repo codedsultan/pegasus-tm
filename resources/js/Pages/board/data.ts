@@ -23,6 +23,8 @@ export interface TaskTypes {
     list_id: number
     order: number
     assignedTo: any
+    assignees: any
+    assignee_ids: any
     user_avatar: {
 	// userAvatar: {
 		id: string
@@ -38,6 +40,17 @@ export interface AssigneeTypes {
 	title: string
 	image: string
 	isImage: boolean
+}
+
+export interface UserTypes {
+	id: number
+    name: string
+    first_name: string
+    last_name: string
+	fullname: string
+	avatar: string
+    email: string
+	// isImage: boolean
 }
 
 // const tasks: TaskTypes[] = [

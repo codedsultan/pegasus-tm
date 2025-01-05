@@ -56,10 +56,15 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         ];
     }
 
-    protected $appends = ['avatar'];
+    protected $appends = ['avatar','fullname'];
     public function avatar(): Attribute
     {
         return Attribute::get(fn () => CreateAvatar::run($this->first_name, $this->email, null, null, 'initials'));
+    }
+
+    public function getFullnameAttribute()
+    {
+        return $this->first_name . ' ' . $this->last_name;
     }
 
     public function tasks()

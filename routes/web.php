@@ -131,8 +131,9 @@ Route::get('/starter', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/boards',[TaskController::class, 'index'])->name('boards.index');
-    Route::post('/boards/task/update', [TaskController::class, 'updateTask'])->name('boards.task.update');
+    Route::put('/boards/task/update/{id}', [TaskController::class, 'updateTask'])->name('boards.task.update');
     Route::post('/boards/update-tasks', [TaskController::class, 'updateTasks'])->name('boards.update-tasks');
+    Route::delete('/boards/task/delete/{id}', [TaskController::class, 'destroy'])->name('boards.task.delete');
 });
 // Task Routes
 // Route::get('/items', [TaskController::class, 'index'])->name('items.index');
@@ -145,5 +146,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
 Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
 Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
-Route::patch('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
 });

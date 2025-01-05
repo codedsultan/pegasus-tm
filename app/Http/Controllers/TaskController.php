@@ -15,18 +15,25 @@ class TaskController extends Controller
         $tasks = Task::all();
         $id = $request->get('task');
         $task = Task::find($id);
+        // $task?->load('assignees:id');
+        // $assigneeIds = Task::findOrFail($id)
+        // ->assignees() // Relationship method
+        // ->pluck('users.id') // Pluck only the IDs
+        // ->toArray();
+        // dd($assigneeIds);
+        // dd($task->assignee_ids);
         $assignees = User::all();
         // dd($tasks);
         return Inertia::render('board/index', [
-            'title' => 'Board',
+            'title' => 'Task Board',
             'description' => 'Attex React is a free and open-source admin dashboard template built with React and Tailwind CSS. It is designed to be easily customizable and includes a wide range of features and components to help you build your own dashboard quickly and efficiently.',
             'tasks' => $tasks,
             'task' => Inertia::defer(
-                fn () => $request->has('task') ? $task->load('assignees') : null
+                fn () => $request->has('task') ? $task?->load('assignees:id') : null
             ),
 
             'assignees' => Inertia::defer(
-                fn () => $request->has('assignees') ? $assignees : null
+                fn () => $request->has('task') ? $assignees : null
             ),
         ]);
     }
@@ -101,8 +108,8 @@ class TaskController extends Controller
             'priority' => 'required|string',
             'description' => 'required|string',
             'dueDate' => 'nullable|date',
-            // 'assignTo' => 'nullable|exists:users,id',
-            'assignees' => 'array',
+            'assignTo' => 'nullable|exists:users,id',
+            'assignees' => 'nullable|array',
             'assignees.*' => 'exists:users,id',
 
         ]);
@@ -115,6 +122,7 @@ class TaskController extends Controller
             'description' => $validated['description'],
             'assigned_to' => $validated['assignTo'],
             'due_date' => Carbon::parse($validated['dueDate'])->format('Y-m-d H:i:s'),
+            'assignTo' => 'nullable|exists:users,id',
         ]);
 
         return redirect()->back()->with('success', 'Task created successfully.');
@@ -129,7 +137,7 @@ class TaskController extends Controller
             'priority' => 'required|string',
             'description' => 'required|string',
             'dueDate' => 'nullable|date',
-            'assignees' => 'array',
+            'assignees' => 'nullable|array',
             'assignees.*' => 'exists:users,id',
 
         ]);
@@ -138,7 +146,7 @@ class TaskController extends Controller
 
         $task->update([
             'title' => $validated['title'],
-            'category' => $validated['category'],
+            // 'category' => $validated['category'],
             'status' => $validated['status'],
             'priority' => $validated['priority'],
             'description' => $validated['description'],
@@ -195,4 +203,21 @@ class TaskController extends Controller
     //         'isImage' => $user->avatar ? true : false,
     //     ];
     // }
+
+    public function destroy($id)
+    {
+        $task = Task::findOrFail($id);
+
+        // Delete the task and its relationships in the pivot table
+        $task->assignees()->detach(); // Detach all related users
+        $task->delete(); // Delete the task itself
+
+        // Redirect the user to the index page
+        // route('boards.index');
+
+        return redirect()->route('boards.index')->with('success', 'Task deleted successfully.');
+
+
+    }
+
 }

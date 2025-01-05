@@ -92,7 +92,7 @@ interface FormInputProps extends InputHTMLAttributes<HTMLInputElement> {
     refCallback?: any
     children?: ReactNode
     rows?: number
-    value?: string  // Add value prop
+    value?: any  // Add value prop
     // error?: string  // Add error prop
 }
 
