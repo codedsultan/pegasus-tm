@@ -1,7 +1,7 @@
 import { useEffect, useState ,useCallback} from 'react'
 import { Head, Link, usePage } from '@inertiajs/react';
 
-import { TaskTypes,assignees } from './data'
+import { TaskTypes ,AssigneeTypes} from './data'
 import { DragDropContext, Draggable, DropResult, Droppable } from 'react-beautiful-dnd'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -59,6 +59,7 @@ const KanbanApp = () => {
     });
 
     const tasks = props.tasks as TaskTypes[];
+    const assignees = props.assignees as AssigneeTypes[];
 
     // order tasks by order
 	const [state, setState] = useState<StateType>({
@@ -134,6 +135,8 @@ const KanbanApp = () => {
 		setData('dueDate', date);
 	};
 
+
+
 	// Handles the form submission
 	const handleNewTask = (e: React.FormEvent) => {
 		e.preventDefault();
@@ -175,15 +178,86 @@ const KanbanApp = () => {
     // const task: any = props.task;
     const { task } = usePage<{ task: TaskTypes | null }>().props;
     const currentUrl = new URL(window.location.href);
-    var isCurrentTask: boolean = currentUrl.searchParams.get('task')?.toString() === task?.id?.toString();
+    var isCurrentTask: boolean = currentUrl.searchParams.get('task')?.toString() === task?.id?.toString() && currentUrl.searchParams.get('task')?.toString() !== undefined;
 
-    console.log('is current task ::' + isCurrentTask);
+    console.log('is current task ::' + isCurrentTask + 'searchParams ::' + currentUrl.searchParams.get('task')?.toString() + 'Task id::' + task?.id?.toString());
     // const [isOpen, setIsOpen] = useState(isCurrenTask);
     const [currentTask, setCurrentTask] = useState(null);
     // const [isModalOpen, setIsModalOpen] = useState(isCurrentTask);
     // const [isOpen, setIsOpen] = useState(isCurrentTask);
     // const [descriptionModal, setDescriptionModal] = useState(true);
     const [descriptionModal, setDescriptionModal] = useState<boolean>(isCurrentTask)
+    const [updateTaskModal, setUpdateTaskModal] = useState<boolean>(false)
+
+    const updateTaskForm = useForm({
+        title: '',
+        priority: '',
+        description: '',
+        assignTo: '',
+        dueDate: new Date(),
+        status: '',
+    });
+
+    const handleUpdateTaskDate = (date: Date) => {
+		updateTaskForm.setData('dueDate', date);
+	};
+
+    const toggleUpdateTaskModal = (task:any) => {
+
+        console.log('in handleUpdateTask ::' + 'task :' + updateTaskForm?.data?.title);
+        setUpdateTaskModal((prevState) => {
+            const newState = !prevState;
+            // console.log('in toggleUpdateTaskModal :: state:', newState); // Correctly log the new state
+            return newState;
+        });
+
+        router.get(
+            route('boards.index'),
+            { task: task?.id },
+            {
+              onSuccess: () => {
+                isCurrentTask = currentUrl.searchParams.get('task')?.toString() === task?.id?.toString();
+
+                updateTaskForm.setData({
+                    title: task?.title,
+                    priority: task?.priority,
+                    description: task?.description,
+                    assignTo: task?.assignedTo,
+                    dueDate: new Date(task?.due_date),
+                    status: task?.status,
+                });
+              },
+              preserveState: true,
+              preserveScroll: true,
+              only: ['task','assignees'],
+            }
+          );
+
+    };
+
+
+    const handleUpdateTask = (e: React.FormEvent) => {
+        e.preventDefault();
+        console.log('in handleUpdateTask ::' + 'task :' + task);
+        // Include the status and queue from the current modal details
+        // setData('status', task?.status);
+
+        updateTaskForm.post(route('boards.task.update'), {
+            preserveScroll: true,
+            onSuccess: () => {
+                // Add the new task to the correct state queue
+                // const modifiedState: any = { ...state };
+                // const tasks = [...getList(newTaskDetails.queue), newTask];
+                // modifiedState[newTaskDetails.queue] = [...tasks];
+                // setState(modifiedState);
+
+                // Close the modal and reset the form
+                // reset();
+                // setNewTaskModal(false);
+                // setTotalTasks(totalTasks + 1);
+            },
+        });
+    };
 	const toggleDescriptionModal = useCallback((task:any) => {
         setCurrentTask(task);
         setDescriptionModal((prevState) => {
@@ -581,7 +655,24 @@ const KanbanApp = () => {
                                     {task?.title}
                                     <span className={`inline-flex items-center gap-1.5 p-1 rounded-md text-xs font-medium ms-3 ${task?.priority === 'High' ? 'bg-danger/10 text-danger' : task?.priority === 'Medium' ? 'bg-warning/10 text-warning' : task?.priority === 'Low' ? 'bg-success/10 text-success' : ''}`}>{task?.priority}</span>
                                 </h3>
+                                <div className="mb-2 inline-block">
+                                    <button type="button" onClick={() => toggleUpdateTaskModal(task)} className="btn btn-link text-xl">
+                                        <i className="ri-edit-line"></i>
+                                    </button>
+                                    <button type="button" onClick={() => toggleDescriptionModal(task)} className="btn btn-link text-xl">
+                                        <i className="ri-delete-bin-line"></i>
+                                    </button>
+                                    <button type="button" onClick={() => toggleDescriptionModal(task)} className="btn btn-link text-xl">
+                                        <i className="ri-archive-drawer-fill"></i>
+                                    </button>
 
+                                    {/* <button
+                                        type="button"
+                                        onClick={() => toggleDescriptionModal(task)}
+                                        className="btn btn-link text-xl"
+                                        Edit
+                                    </button> */}
+                                </div>
                                 <button className="inline-flex flex-shrink-0 justify-center items-center h-8 w-8 dark:text-gray-200" onClick={() =>toggleDescriptionModal(task)} type="button">
                                     <i className="ri-close-line text-xl"></i>
                                 </button>
@@ -773,6 +864,118 @@ const KanbanApp = () => {
                     </div>
                 </ModalLayout>
                  {/* } */}
+
+
+                 <ModalLayout
+                    showModal={updateTaskModal}
+                    toggleModal={() => toggleUpdateTaskModal(task)}
+                    aria-hidden="true"
+                    panelClassName="min-w-[768px]"
+                    >
+                     <div className="bg-white pointer-events-none relative w-auto -translate-y-5 transition-all duration-300 ease-in-out sm:max-w-2xl md:max-w-3xl sm:w-full h-full flex items-center rounded-md shadow-lg dark:bg-gray-800 sm:mx-auto">
+                        <div className="pointer-events-auto relative flex w-full flex-col">
+                            <div className="flex justify-between items-center py-2.5 px-4 border-b dark:border-gray-700 pt-8">
+                                {/* <h3 className="font-medium text-gray-800 dark:text-white text-lg">
+                                Update Task
+                                </h3> */}
+                                <h3 className="font-medium text-gray-800 dark:text-white text-lg">
+                                    Update Task - {updateTaskForm?.data.title}
+                                        {/* <span className={`inline-flex items-center gap-1.5 p-1 rounded-md text-xs font-medium ms-3 ${task?.priority === 'High' ? 'bg-danger/10 text-danger' : task?.priority === 'Medium' ? 'bg-warning/10 text-warning' : task?.priority === 'Low' ? 'bg-success/10 text-success' : ''}`}>{task?.priority}</span> */}
+                                </h3>
+                                <div className="mb-2 inline-block">
+
+                                    <button type="button" onClick={() => toggleDescriptionModal(task)} className="btn btn-link text-xl">
+                                        <i className="ri-delete-bin-line"></i>
+                                    </button>
+                                    <button type="button" onClick={() => toggleDescriptionModal(task)} className="btn btn-link text-xl">
+                                        <i className="ri-archive-drawer-fill"></i>
+                                    </button>
+
+                                    {/* <button
+                                        type="button"
+                                        onClick={() => toggleDescriptionModal(task)}
+                                        className="btn btn-link text-xl"
+                                        Edit
+                                    </button> */}
+                                </div>
+                                <button
+                                    className="inline-flex flex-shrink-0 justify-center items-center h-8 w-8 dark:text-gray-200"
+                                    onClick={() => toggleUpdateTaskModal(task)}
+                                    type="button"
+                                >
+                                    <i className="ri-close-line text-xl"></i>
+                                </button>
+                            </div>
+
+                            <form className="px-4 py-8 overflow-y-auto" onSubmit={handleUpdateTask}>
+                                {/* Task Title */}
+                                <div className="mb-4">
+                                    <FormInput name="title" label="Title" placeholder="Enter Title" type="text" containerClass="space-y-1.5 mb-6" className="form-input" key="title"  value={updateTaskForm?.data.title} errors={updateTaskForm?.errors} onChange={(e) => updateTaskForm.setData('title', e.target.value)} />
+
+                                </div>
+
+                                {/* Task Priority */}
+                                <div className="mb-4">
+                                    <FormInput name="priority" label="Priority" type="select" containerClass="space-y-1.5 mb-6" className="form-select" key="priority" value={updateTaskForm?.data.priority} errors={updateTaskForm?.errors} onChange={(e) => updateTaskForm.setData('priority', e.target.value)}>
+                                        <option>Low</option>
+                                        <option>Medium</option>
+                                        <option>High</option>
+                                    </FormInput>
+
+                                </div>
+
+                                {/* Task Description */}
+                                <div className="mb-4">
+                                    <FormInput name="description" label="Description" type="textarea" containerClass="w-full space-y-1.5 mb-6" className="form-input" rows={3} key="description" value={updateTaskForm?.data.description} errors={updateTaskForm?.errors} onChange={(e) => updateTaskForm.setData('description', e.target.value)} />
+                                </div>
+
+                                {/* Dates */}
+                                <div className="grid sm:grid-cols-2 gap-6 mb-4">
+                                    <div className="col-md-6">
+                                        <div className="space-y-1.5 mb-6 flex flex-col">
+                                            <label htmlFor="task-priority" className="font-semibold text-gray-500">
+                                                Due Date
+                                            </label>
+                                            <CustomDatepicker
+                                                hideAddon
+                                                dateFormat="yyyy-MM-dd"
+                                                value={updateTaskForm?.data.dueDate}
+                                                inputClass="form-input"
+                                                onChange={(date) => {
+                                                    handleUpdateTaskDate(date)
+                                                }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* <div>
+
+                                        <FormInput name="dueDate" label="Due Date" type="date" containerClass="space-y-1.5 mb-6" className="form-input" key="dueDate" value={updateTaskForm?.data.dueDate} errors={updateTaskForm?.errors} onChange={(e) => updateTaskForm.setData('dueDate', e.target.value)} />
+                                    </div> */}
+                                </div>
+
+                                {/* Assignee */}
+                                <div className="mb-4">
+                                    <FormInput name="assignTo" label="Assign To" type="select" containerClass="space-y-1.5 mb-6" labelClassName="font-semibold text-gray-500" className="form-select" key="assignTo" value={updateTaskForm?.data.assignTo} errors={errors} onChange={(e) => updateTaskForm.setData('assignTo', e.target.value)}>
+                                        {(assignees || []).map((assignee, idx) => (
+                                            <option key={idx} value={assignee.id}>
+                                                {assignee.title}
+                                            </option>
+                                        ))}
+                                    </FormInput>
+                                </div>
+
+                                {/* Submit Button */}
+                                <div className="flex justify-end">
+                                    <button type="submit" className="btn bg-primary text-white btn-sm">
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </ModalLayout>
+
             </VerticalLayout>
 		</>
 	)

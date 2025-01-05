@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -14,13 +15,18 @@ class TaskController extends Controller
         $tasks = Task::all();
         $id = $request->get('task');
         $task = Task::find($id);
+        $assignees = User::all();
         // dd($tasks);
         return Inertia::render('board/index', [
             'title' => 'Board',
             'description' => 'Attex React is a free and open-source admin dashboard template built with React and Tailwind CSS. It is designed to be easily customizable and includes a wide range of features and components to help you build your own dashboard quickly and efficiently.',
             'tasks' => $tasks,
             'task' => Inertia::defer(
-                fn () => $request->has('task') ? $task : null
+                fn () => $request->has('task') ? $task->load('assignees') : null
+            ),
+
+            'assignees' => Inertia::defer(
+                fn () => $request->has('assignees') ? $assignees : null
             ),
         ]);
     }
@@ -88,7 +94,6 @@ class TaskController extends Controller
     }
     public function store(Request $request)
     {
-        // dd($request->all());
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'required|string',
@@ -96,12 +101,12 @@ class TaskController extends Controller
             'priority' => 'required|string',
             'description' => 'required|string',
             'dueDate' => 'nullable|date',
-            'assignTo' => 'nullable|exists:users,id',
-            // 'assigned_to' => 'nullable|exists:users,id',
-            // 'due_date' => 'nullable|date',
+            // 'assignTo' => 'nullable|exists:users,id',
+            'assignees' => 'array',
+            'assignees.*' => 'exists:users,id',
+
         ]);
 
-        // Task::create($validated);
         Task::create([
             'title' => $validated['title'],
             'category' => $validated['category'],
@@ -115,21 +120,38 @@ class TaskController extends Controller
         return redirect()->back()->with('success', 'Task created successfully.');
     }
 
-    public function update(Request $request, Task $task)
+    public function updateTask(Request $request, $id)
     {
         $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            // 'category' => 'required|string',
             'status' => 'required|string',
+            'priority' => 'required|string',
+            'description' => 'required|string',
+            'dueDate' => 'nullable|date',
+            'assignees' => 'array',
+            'assignees.*' => 'exists:users,id',
+
         ]);
 
-        $task->update($validated);
+        $task = Task::findOrFail($id);
+
+        $task->update([
+            'title' => $validated['title'],
+            'category' => $validated['category'],
+            'status' => $validated['status'],
+            'priority' => $validated['priority'],
+            'description' => $validated['description'],
+            'due_date' => Carbon::parse($validated['dueDate'])->format('Y-m-d H:i:s'),
+        ]);
+
+        $task->assignees()->sync($request->assignees);
 
         return redirect()->back()->with('success', 'Task updated successfully.');
     }
 
     public function updateTasks(Request $request)
     {
-        // dd('here');
-        // dd
         $validated = $request->validate([
             'sourceId' => 'required|string',
             'destinationId' => 'nullable|string',
@@ -163,4 +185,14 @@ class TaskController extends Controller
 
         return redirect()->back()->with(['message' => 'Tasks updated successfully!'], 200);
     }
+
+    // public function serializeAssignees(User $user)
+    // {
+    //     return [
+    //         'id' => $user->id,
+    //         'title' => $user->name,
+    //         'image' => $user->avatar,
+    //         'isImage' => $user->avatar ? true : false,
+    //     ];
+    // }
 }

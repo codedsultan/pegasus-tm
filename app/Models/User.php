@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use App\Actions\CreateAvatar;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -10,6 +12,8 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+
 class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -51,4 +55,16 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
             'password' => 'hashed',
         ];
     }
+
+    protected $appends = ['avatar'];
+    public function avatar(): Attribute
+    {
+        return Attribute::get(fn () => CreateAvatar::run($this->first_name, $this->email, null, null, 'initials'));
+    }
+
+    public function tasks()
+    {
+        return $this->belongsToMany(Task::class, 'task_user');
+    }
+
 }

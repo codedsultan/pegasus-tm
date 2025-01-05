@@ -22,6 +22,7 @@ export interface TaskTypes {
 	comments: number
     list_id: number
     order: number
+    assignedTo: any
     user_avatar: {
 	// userAvatar: {
 		id: string
@@ -32,7 +33,7 @@ export interface TaskTypes {
 	}[]
 }
 
-interface AssigneeTypes {
+export interface AssigneeTypes {
 	id: number
 	title: string
 	image: string
