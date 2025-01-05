@@ -18,9 +18,9 @@ createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) => {
 
-        const pages = import.meta.glob('./Pages/**/*.tsx', { eager: true })
+        const pages = import.meta.glob('./pages/**/*.tsx', { eager: true })
 
-        const path = `./Pages/${name}.tsx`
+        const path = `./pages/${name}.tsx`
         return resolvePageComponentForReact(path, pages)
     },
     setup({ el, App, props }) {
