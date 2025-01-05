@@ -120,7 +120,7 @@ function subtractHours(date: Date, minutes: number) {
 const Topbar = () => {
     // get from usepage props username="Tosha Minner"
     const { auth } = usePage().props;
-    console.log(auth);
+    // console.log(auth);
 	const dispatch = useDispatch<AppDispatch>()
 	const { width } = useViewPort()
 
@@ -261,7 +261,7 @@ const Topbar = () => {
 				</div>
 
 				<div className="relative">
-					<ProfileDropDown profiliePic={profilePic} menuItems={profileMenus} username={auth?.user.first_name} userTitle="Founder" />
+					<ProfileDropDown profiliePic={profilePic} menuItems={profileMenus} username={auth?.user?.first_name} userTitle="Founder" />
 				</div>
 			</header>
 		</React.Fragment>

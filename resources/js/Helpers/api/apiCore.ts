@@ -21,7 +21,7 @@ axios.interceptors.response.use(
 		} else if (error && error.response && error.response.status === 403) {
 			window.location.href = '/access-denied'
 		} else {
-			switch (error.response.status) {
+			switch (error.response?.status) {
 				case 401:
 					message = 'Invalid credentials'
 					break

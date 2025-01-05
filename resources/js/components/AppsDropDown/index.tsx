@@ -77,7 +77,7 @@ const AppsDropDown = () => {
 						{(appsChunks || []).map((chunk) =>
 							(chunk || []).map((item, idx) => {
 								return (
-									<Link key={idx} to={item.redirectTo} className="flex flex-col items-center justify-center gap-1.5 py-3 px-6 rounded-md text-sm text-gray-800 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300">
+									<Link key={idx} href={item.redirectTo} className="flex flex-col items-center justify-center gap-1.5 py-3 px-6 rounded-md text-sm text-gray-800 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-gray-300">
 										<img src={item.icon} className="h-6" alt={item.name} />
 										<span>{item.name}</span>
 									</Link>

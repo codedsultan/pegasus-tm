@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -27,8 +28,25 @@ class Task extends Model
         'due_date' => 'date',
         'user_avatar' => 'array',
     ];
+
+    protected $appends = ['assignee_ids'];
     public function user()
     {
         return $this->belongsTo(User::class, 'assignedTo');
     }
+
+    public function assignees()
+    {
+        return $this->belongsToMany(User::class, 'task_user');
+    }
+
+    public function assigneeIds(): Attribute
+    {
+        return Attribute::get(fn () =>
+            $this->assignees()
+                ->pluck('users.id')
+                ->toArray()
+        );
+    }
+
 }
