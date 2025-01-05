@@ -11,6 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('users')) {
+            Schema::dropIfExists('users');
+            Schema::dropIfExists('password_reset_tokens');
+            Schema::dropIfExists('sessions');
+        }
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('first_name');
