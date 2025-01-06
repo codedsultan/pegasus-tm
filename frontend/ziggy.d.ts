@@ -25,14 +25,25 @@ declare module 'ziggy-js' {
     "password.update": [],
     "logout": [],
     "boards.index": [],
+    "boards.task.update": [
+        {
+            "name": "id",
+            "required": true
+        }
+    ],
     "boards.update-tasks": [],
+    "boards.task.delete": [
+        {
+            "name": "id",
+            "required": true
+        }
+    ],
     "tasks.index": [],
     "tasks.store": [],
     "tasks.update": [
         {
             "name": "task",
-            "required": true,
-            "binding": "id"
+            "required": true
         }
     ],
     "storage.local": [

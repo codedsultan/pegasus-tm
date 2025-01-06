@@ -449,7 +449,13 @@ const KanbanApp = () => {
 	return (
 		<>
             <VerticalLayout {...props}>
-                {/* <PageBreadcrumb title={usePage().props.title} addedChild={<BreadcrumbChild />} /> */}
+                <div className="flex justify-between items-center mb-6">
+					<div className="flex gap-4">
+						<h4 className="text-slate-900 dark:text-slate-200 text-lg font-medium">{String(usePage().props?.title)}</h4>
+						<BreadcrumbChild />
+					</div>
+                </div>
+
                 <div className="grid w-full">
                     <div className="overflow-hidden text-gray-700 dark:text-slate-400">
                         <DragDropContext onDragEnd={onDragEnd}>
