@@ -279,7 +279,7 @@ const KanbanApp = () => {
             },
         });
     };
-	const toggleDescriptionModal = useCallback((task:any) => {
+	const toggleDescriptionModal = (task:any) => {
         updateTaskForm.clearErrors();
             setDescriptionModal((prevState) => {
                 const newState = !prevState;
@@ -306,7 +306,8 @@ const KanbanApp = () => {
         console.log('in toggleDescriptionModal ::' + 'after state :' + descriptionModal);
 
 
-	}, [task]);
+	}
+    // , [task]);
 
 
     useEffect(() => {

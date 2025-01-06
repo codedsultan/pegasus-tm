@@ -1,5 +1,5 @@
 // apicore
-import { APICore } from '../../helpers/api/apiCore'
+import { APICore } from '../../Helpers/api/apiCore'
 
 // constants
 import { AuthActionTypes } from './constants'

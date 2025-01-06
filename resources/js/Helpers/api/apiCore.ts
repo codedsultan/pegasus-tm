@@ -145,8 +145,9 @@ class APICore {
 
 		const config = {
 			headers: {
-				...axios.defaults.headers,
-				'content-type': 'multipart/form-data',
+				// ...axios.defaults.headers,
+				// 'content-type': 'multipart/form-data',
+                'Content-Type': 'multipart/form-data',
 			},
 		}
 		return axios.post(url, formData, config)
@@ -163,8 +164,9 @@ class APICore {
 
 		const config = {
 			headers: {
-				...axios.defaults.headers,
-				'content-type': 'multipart/form-data',
+				// ...axios.defaults.headers,
+                'Content-Type': 'multipart/form-data',
+				// 'content-type': 'multipart/form-data',
 			},
 		}
 		return axios.patch(url, formData, config)

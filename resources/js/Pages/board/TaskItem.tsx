@@ -15,8 +15,8 @@ const TaskItem = ({ task, toggleDescriptionModal }: TaskItemProps) => {
 				<div className="flex justify-between items-center">
 					<small>{task.dueDate}</small>
 					<span
-						className={`inline-flex items-center gap-1.5 px-1 rounded-md text-xs font-medium 
-          ${task.priority === 'High' ? 'bg-danger/10 text-danger' : task.priority === 'Medium' ? 'bg-warning/10 text-warning' : task.priority === 'Low' ? 'bg-success/10 text-success' : ''}`}
+						className={`inline-flex items-center gap-1.5 px-1 rounded-md text-xs font-medium
+                        ${task.priority === 'High' ? 'bg-danger/10 text-danger' : task.priority === 'Medium' ? 'bg-warning/10 text-warning' : task.priority === 'Low' ? 'bg-success/10 text-success' : ''}`}
 					>
 						{task.priority}
 					</span>
@@ -36,7 +36,7 @@ const TaskItem = ({ task, toggleDescriptionModal }: TaskItemProps) => {
 				</p>
 				<div className="mt-5">
 					<div className="flex items-center">
-						{(task.userAvatar || []).map((avatar, idx) => (
+						{(task.user_avatar || []).map((avatar, idx) => (
 							<Tippy content={avatar.title} key={idx}>
 								<div className="-me-3">{avatar.isImage ? <img src={avatar.image} alt={avatar.title} className="rounded-full h-8 w-8 hover:-translate-y-0.5 transition-all duration-200" /> : <div className={`${avatar.textBg} font-medium flex items-center justify-center rounded-full h-8 w-8 hover:-translate-y-0.5 transition-all duration-200`}>{avatar.image}</div>}</div>
 							</Tippy>

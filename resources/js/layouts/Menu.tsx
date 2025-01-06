@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Head, Link } from '@inertiajs/react';
 
 // helpers
-import { findAllParent, findMenuItem } from '../helpers/menu'
+import { findAllParent, findMenuItem } from '../Helpers/menu'
 
 // constants
 import { MenuItemTypes } from '../constants/menu'
