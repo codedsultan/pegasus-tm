@@ -31,14 +31,14 @@ const TaskItem = ({ task, toggleDescriptionModal }: TaskItemProps) => {
 					&nbsp;
 					<span className="text-nowrap mb-2">
 						<i className="ri-discuss-line text-gray-500 dark:text-gray-400"></i>
-						<b className="text-gray-500 dark:text-gray-400">&nbsp;{task.comments}</b> Comments
+						<b className="text-gray-500 dark:text-gray-400">&nbsp;{task.comment_count}</b> Comments
 					</span>
 				</p>
 				<div className="mt-5">
 					<div className="flex items-center">
-						{(task.user_avatar || []).map((avatar, idx) => (
+						{(task.assignees || []).map((avatar : any, idx: number) => (
 							<Tippy content={avatar.title} key={idx}>
-								<div className="-me-3">{avatar.isImage ? <img src={avatar.image} alt={avatar.title} className="rounded-full h-8 w-8 hover:-translate-y-0.5 transition-all duration-200" /> : <div className={`${avatar.textBg} font-medium flex items-center justify-center rounded-full h-8 w-8 hover:-translate-y-0.5 transition-all duration-200`}>{avatar.image}</div>}</div>
+								<div className="-me-3">{true? <img src={avatar.avatar_img || avatar.avatar} alt={avatar.first_name} className="rounded-full h-8 w-8 hover:-translate-y-0.5 transition-all duration-200" /> : <div className={`${avatar.textBg} font-medium flex items-center justify-center rounded-full h-8 w-8 hover:-translate-y-0.5 transition-all duration-200`}>{avatar.image}</div>}</div>
 							</Tippy>
 						))}
 					</div>

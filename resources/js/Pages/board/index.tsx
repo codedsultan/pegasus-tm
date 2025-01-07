@@ -1,4 +1,4 @@
-import { useEffect, useState ,useCallback} from 'react'
+import { useEffect, useState ,useCallback, use} from 'react'
 import { Head, Link, usePage } from '@inertiajs/react';
 
 import { TaskTypes ,AssigneeTypes, UserTypes} from './data'
@@ -19,12 +19,13 @@ import avatar5 from '@/assets/images/users/avatar-5.jpg'
 import Img1 from '@/assets/images/small/small-1.jpg'
 
 // components
-import { FormInput, CustomDatepicker, PageBreadcrumb } from '../../components'
+import { FormInput, CustomDatepicker, PageBreadcrumb ,FileUploader} from '../../components'
 import { ModalLayout } from '../../components/HeadlessUI'
 import { Tab } from '@headlessui/react'
 import VerticalLayout from '@/layouts/Vertical';
 import Task from '../apps/Tasks/TasksDetails/Task';
 import { route } from 'vendor/tightenco/ziggy/src/js';
+import { FileType } from '@/components/FileUploader';
 
 interface StateType {
 	todoTasks: TaskTypes[]
@@ -32,6 +33,7 @@ interface StateType {
 	reviewTasks: TaskTypes[]
 	doneTasks: TaskTypes[]
 }
+
 
 const KanbanApp = () => {
     // const { post, patch } = useForm();
@@ -104,26 +106,6 @@ const KanbanApp = () => {
 		})
 	)
 
-	/*
-	 * Form methods
-	 */
-	// const methods = useForm({ resolver: schemaResolver })
-	// const {
-	// 	handleSubmit,
-	// 	register,
-	// 	control,
-	// 	reset,
-	// 	formState: { errors },
-	// } = methods
-    // const handleSubmit = (data: any) => {
-    //     post('/tasks', {
-    //         ...data,
-    //         onSuccess: () => {
-    //             // Update state after successful creation
-    //         },
-    //     });
-    // };
-
     // Handles input changes
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
 		const { name, value } = e.target;
@@ -135,15 +117,11 @@ const KanbanApp = () => {
 		setData('dueDate', date);
 	};
 
-
-
 	// Handles the form submission
 	const handleNewTask = (e: React.FormEvent) => {
 		e.preventDefault();
-
 		// Include the status and queue from the current modal details
 		setData('status', newTaskDetails.status);
-
 		post('/tasks', {
 			onSuccess: () => {
 				// Add the new task to the correct state queue
@@ -195,10 +173,11 @@ const KanbanApp = () => {
         dueDate?: Date;
         status?: string;
         priority?: string;
+        files?: any[] ;
 
         // Define 'assignees' as an array of strings
     }
-
+    // const [selectedFiles, setSelectedFiles] = useState<FileType[]>([])
     const updateTaskForm = useForm<TaskFormData>({
         title: '',
         priority: '',
@@ -207,12 +186,117 @@ const KanbanApp = () => {
         dueDate: new Date(),
         status: '',
         assignees: [],
+        files: [],
     });
+
+
+
+
+    const { setData: updateForm } = updateTaskForm;
 
     const handleUpdateTaskDate = (date: Date) => {
 		updateTaskForm.setData('dueDate', date);
 	};
 
+    // const [files, setFiles] = useState<File[]>([]);
+    // const [taskFileUpload, settaskFileUpload] = useState({
+    //         name: '',
+    //         files: [],
+    // });
+
+    // const handleFileChange = (e) => {
+    //     settaskFileUpload({
+    //         ...taskFileUpload,
+    //         files: [...e.target.files], // Store the selected files as an array
+    //     });
+    // };
+    const deleteFile = (fileId: any) => {
+        // const updatedFiles = selectedFiles.filter((f) => f !== file);
+        // setSelectedFiles(updatedFiles);
+        router.delete(route('tasks.deleteFile',{mediaId:fileId}),{
+            onSuccess: () => {
+                console.log('File deleted successfully');
+            },
+        });
+    };
+    const handleTaskFileUpload = (files: any[]) => {
+        // e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('id', task?.id?.toString() || '');
+
+        // Append each file
+        // form.files.forEach((file) => {
+        //     formData.append('files[]', file); // Add files to the FormData
+        // });
+        files.forEach((file) => {
+            formData.append('files[]', file); // Add files to the FormData
+        });
+        // Send the request
+        console.log('FormData:', formData);
+
+        router.post(route('tasks.uploadFiles',{id:task?.id}), formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data', // Optional; FormData sets this automatically
+            },
+            onFinish: () => {
+                console.log('File upload complete');
+                // files = [];
+            },
+        });
+
+    };
+    // useEffect(() => {
+    //    if(taskFileUpload.files.length > 0){
+    //        console.log('files', taskFileUpload.files);
+    //        handleTaskFileUpload(taskFileUpload);
+    //     //    updateTaskForm.setData((data) => ({
+    //     //        ...data,
+    //     //        files: taskFileUpload.files,
+    //     //    }));
+    //    }
+    // }, [taskFileUpload]);
+    // const [files, setFiles] = useState<File[]>([]);
+    // const handleFileChange = (e: any) => {
+    //     setFiles([...e.target.files]);
+
+    //     router.post(route('boards.task.update',{id:task?.id,update:task?.id}), {
+    //         __method: 'put',
+    //         headers: {
+    //             'Content-Type': 'multipart/form-data',
+    //         },
+    //         files : files,
+    //     });// Update state with selected files
+    // };
+    const handleFileUpload = (xfiles: any[]) => {
+        // updateTaskForm.setData('files', files);
+        // setSelectedFiles(files)
+        const formData = new FormData();
+        xfiles.forEach((file, index) => {
+            console.log('File:', file.formattedSize);
+            formData.append(`files[${index}]`, file.formattedSize); // Add files to FormData
+        });
+        updateTaskForm.setData((data:any) => ({
+            ...data,
+            files: formData,
+        }));
+
+        // setFiles([...e.target.files]);
+
+        // router.post(route('boards.task.update',{id:task?.id,update:task?.id}), {
+        //     __method: 'put',
+        //     headers: {
+        //         'Content-Type': 'multipart/form-data',
+        //     },
+        //     files : xfiles,
+        // });
+        // updateTaskForm.setData('files', formData);
+        // updateTaskForm.data.formData = formData;
+        // updateTaskForm.refresh();
+        console.log('Uploaded files:', xfiles);
+
+        // You can process files here, e.g., send to server
+    };
     const toggleUpdateTaskModal = (task:any) => {
         updateTaskForm.clearErrors();
         // console.log('in handleUpdateTask ::' + 'task :' + updateTaskForm?.data?.title);
@@ -243,6 +327,7 @@ const KanbanApp = () => {
                     dueDate: new Date(task?.due_date),
                     status: task?.status,
                     assignees: task?.assignee_ids,
+                    // files: task?.files,
                 });
 
 
@@ -266,8 +351,13 @@ const KanbanApp = () => {
         console.log('in handleUpdateTask ::' + 'task :' + task);
         // Include the status and queue from the current modal details
         // setData('status', task?.status);
-
-        updateTaskForm.put(route('boards.task.update',{id:task?.id,update:task?.id}), {
+        // router.post(route('boards.task.update',{id:task?.id,update:task?.id}), {
+        //     headers: {
+        //         'Content-Type': 'multipart/form-data',
+        //     },
+        //     files: updateTaskForm?.data.files,
+        // });
+        updateTaskForm.post(route('boards.task.update',{id:task?.id,update:task?.id}), {
             preserveScroll: true,
             preserveState: true,
             onSuccess: () => {
@@ -314,6 +404,10 @@ const KanbanApp = () => {
         setDescriptionModal(isCurrentTask);
     }, [isCurrentTask]);
 
+    // useEffect(() => {
+    //     updateTaskForm.setData('files', selectedFiles);
+    //     console.log('Form data updated:', updateTaskForm.data.files);
+    // }, [selectedFiles]);
 	/**
 	 * Creates new empty task with given status
 	 * @param status
@@ -446,6 +540,24 @@ const KanbanApp = () => {
             only: ['tasks','task'],
         })
       };
+
+      const archiveTask = (task:any) => {
+        router.patch(route('tasks.archive',{id:task?.id}), {}, {
+            preserveState: true,
+            preserveScroll: true,
+            onSuccess: () => {
+                refreshTaskList();
+                console.log('in archiveTask ::' + 'onSuccess');
+            },
+        });
+      };
+
+    //   const commentsProps = usePage().props?.tcomments;
+      const [comments, setComments] = useState<any>([]);
+
+      useEffect(() => {
+        setComments(task?.comments);
+      }, [task?.comments]);
 	return (
 		<>
             <VerticalLayout {...props}>
@@ -652,7 +764,7 @@ const KanbanApp = () => {
                                     <button type="button" onClick={() => deleteTask(task?.id)} className="btn btn-link text-xl">
                                         <i className="ri-delete-bin-line"></i>
                                     </button>
-                                    <button type="button" onClick={() => toggleDescriptionModal(task)} className="btn btn-link text-xl">
+                                    <button type="button" onClick={() => archiveTask(task)} className="btn btn-link text-xl">
                                         <i className="ri-archive-drawer-fill"></i>
                                     </button>
 
@@ -703,7 +815,23 @@ const KanbanApp = () => {
                                         <div className="col-span-1">
                                             <h5 className="mb-2 text-gray-600">Asignee:</h5>
                                             <div className="flex items-center">
-                                                <div className="-me-3">
+
+                                                {(task?.assignees || []).map((assignee:any, idx:number) => (
+                                                // <>
+                                                    <div className="-me-3">
+                                                        <Link key={idx} href={assignee.avatar} target="_blank">
+                                                            <img src={assignee.avatar_img || assignee.avatar} alt="" className="rounded-full h-8 w-8 hover:-translate-y-0.5 transition-all duration-200" />
+                                                        </Link>
+                                                        <div className="bg-slate-700 hidden px-2 py-1 rounded transition-all text-white opacity-0 z-50" role="tooltip">
+                                                            {assignee.fullname}
+                                                            <div className="bg-slate-700 w-2.5 h-2.5 rotate-45 -z-10 rounded-[1px]"></div>
+                                                        </div>
+                                                    </div>
+                                                // </>
+
+                                                ))}
+
+                                                {/* </div>
                                                     <Link href="">
                                                         <img src={avatar1} alt="" className="rounded-full h-8 w-8 hover:-translate-y-0.5 transition-all duration-200" />
                                                     </Link>
@@ -711,9 +839,9 @@ const KanbanApp = () => {
                                                         Tosha
                                                         <div className="bg-slate-700 w-2.5 h-2.5 rotate-45 -z-10 rounded-[1px]"></div>
                                                     </div>
-                                                </div>
+                                                </div> */}
 
-                                                <div className="-me-3">
+                                                {/* <div className="-me-3">
                                                     <Link href="">
                                                         <div className="bg-warning text-white font-medium flex items-center justify-center rounded-full h-8 w-8 hover:-translate-y-0.5 transition-all duration-200">K</div>
                                                     </Link>
@@ -721,9 +849,9 @@ const KanbanApp = () => {
                                                         Hooker
                                                         <div className="bg-slate-700 w-2.5 h-2.5 rotate-45 -z-10 rounded-[1px]"></div>
                                                     </div>
-                                                </div>
+                                                </div> */}
 
-                                                <div className="-me-3">
+                                                {/* <div className="-me-3">
                                                     <Link href="">
                                                         <img src={avatar5} alt="" className="rounded-full h-8 w-8 hover:-translate-y-0.5 transition-all duration-200" />
                                                     </Link>
@@ -731,7 +859,7 @@ const KanbanApp = () => {
                                                         Brain
                                                         <div className="bg-slate-700 w-2.5 h-2.5 rotate-45 -z-10 rounded-[1px]"></div>
                                                     </div>
-                                                </div>
+                                                </div> */}
                                             </div>
                                         </div>
                                     </div>
@@ -762,8 +890,38 @@ const KanbanApp = () => {
                                                     </button>
                                                 </div>
                                             </div>
+                                            {comments?.length > 0 ? (
+                                                comments.map((comment:any, idx:number) => (
+                                                <div key={idx} className="flex gap-5 border rounded-md border-gray-300 dark:border-gray-700 p-3 mb-2">
+                                                    <img src={comment.user?.avatar_img || comment.user?.avatar} alt="" className="h-12 rounded-full" />
+                                                    <div className="w-full">
+                                                        <h5 className="mb-2 text-gray-500 dark:text-gray-400 font-semibold">{comment.user?.fullname}</h5>
+                                                        <p className="font-light mb-2">{comment.content}</p>
+                                                        {comment.replies?.length > 0 ? (
+                                                            comment.replies.map((reply:any, idx:number) => (
+                                                            <div key={idx} className="flex gap-5 border rounded-md border-gray-300 dark:border-gray-700 p-3 mb-2">
+                                                                <img src={reply.user?.avatar_img || reply.user?.avatar} alt="" className="h-12 rounded-full" />
+                                                                <div className="w-full">
+                                                                    <h5 className=" text-gray-500 dark:text-gray-400 font-semibold">{reply.user?.fullname}</h5>
+                                                                    <p className="font-light mb-2">{reply.content}</p>
+                                                                </div>
+                                                            </div>
+                                                            ))
+                                                        ) : (
+                                                            <p className="font-light text-gray-500 dark:text-gray-400">
+                                                                No replies for this comment.
+                                                            </p>
+                                                        )}
+                                                    </div>
 
-                                            <div className="flex gap-5">
+                                                </div>
+                                                )
+                                            ) ): (
+                                            <p className="font-light text-gray-500 dark:text-gray-400">
+                                                No comments for this task.
+                                            </p>
+                                            )}
+                                            {/* <div className="flex gap-5">
                                                 <img src={avatar3} alt="" className="h-12 rounded-full" />
                                                 <div className="w-full">
                                                     <h5 className="mb-2 text-gray-500 dark:text-gray-400 font-semibold">Jeremy Tomlinson</h5>
@@ -779,62 +937,57 @@ const KanbanApp = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div> */}
                                         </Tab.Panel>
                                         <Tab.Panel className="transition-all duration-300 transform">
-                                            <div className="border rounded-md border-gray-300 dark:border-gray-700 p-3 mb-2 flex justify-between">
-                                                <div className="flex items-center gap-3">
-                                                    <span className="flex items-center justify-center bg-primary text-white font-semibold rounded-md w-12 h-12">.ZIP</span>
+                                            {task?.media?.length > 0 ? (
+                                                task?.media.map((file:any) => (
+                                                <div
+                                                    key={file.id}
+                                                    className="border rounded-md border-gray-300 dark:border-gray-700 p-3 mb-2 flex justify-between"
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                    {/* Display file type icon or thumbnail */}
+                                                    {file.file_name.endsWith(".zip") ? (
+                                                        <span className="flex items-center justify-center bg-primary text-white font-semibold rounded-md w-12 h-12">
+                                                        .ZIP
+                                                        </span>
+                                                    ) : file.file_name.endsWith(".jpg") || file.file_name.endsWith(".png") ? (
+                                                        <img
+                                                        src={file.original_url}
+                                                        alt={file.name}
+                                                        className="h-12 w-12 rounded-md"
+                                                        />
+                                                    ) : file.file_name.endsWith(".mp4") ? (
+                                                        <span className="flex items-center justify-center bg-secondary text-white font-semibold rounded-md w-12 h-12">
+                                                        .MP4
+                                                        </span>
+                                                    ) : (
+                                                        <span className="flex items-center justify-center bg-gray-500 text-white font-semibold rounded-md w-12 h-12">
+                                                        ?
+                                                        </span>
+                                                    )}
+                                                    {/* File details */}
                                                     <div>
-                                                        <Link href="" className="font-medium">
-                                                            -admin-design.zip
+                                                        <Link href={file.original_url} className="font-medium" target="_blank">
+                                                        {file.name}
                                                         </Link>
-                                                        <p className="font-light">2.3 MB</p>
+                                                        {file.size && <p className="font-light">{file.size}</p>}
                                                     </div>
-                                                </div>
-
-                                                <div className="flex justify-between items-center">
-                                                    <Link href="" className="btn btn-link">
+                                                    </div>
+                                                    {/* Download link */}
+                                                    <div className="flex justify-between items-center">
+                                                    <Link href={file.original_url} target="_blank" className="btn btn-link">
                                                         <i className="ri-download-line text-lg"></i>
                                                     </Link>
-                                                </div>
-                                            </div>
-
-                                            <div className="border rounded-md border-gray-300 dark:border-gray-700 p-3 mb-2 flex justify-between">
-                                                <div className="flex items-center gap-3">
-                                                    <span>
-                                                        <img src={Img1} alt="" className="h-12 w-12 rounded-md" />
-                                                    </span>
-                                                    <div>
-                                                        <Link href="" className="font-medium">
-                                                            Dashboard-design.jpg
-                                                        </Link>
-                                                        <p className="font-light">3.25 MB</p>
                                                     </div>
                                                 </div>
-                                                <div className="flex justify-between items-center">
-                                                    <Link href="" className="btn btn-link">
-                                                        <i className="ri-download-line text-lg"></i>
-                                                    </Link>
-                                                </div>
-                                            </div>
-
-                                            <div className="border rounded-md border-gray-300 dark:border-gray-700 p-3 mb-2 flex justify-between">
-                                                <div className="flex items-center gap-3">
-                                                    <span className="flex items-center justify-center bg-secondary text-white font-semibold rounded-md w-12 h-12">.MP4</span>
-                                                    <div>
-                                                        <Link href="" className="font-medium">
-                                                            Admin-bug-report.mp4
-                                                        </Link>
-                                                        <p className="font-light">7.05 MB</p>
-                                                    </div>
-                                                </div>
-                                                <div className="flex justify-between items-center">
-                                                    <Link href="" className="btn btn-link">
-                                                        <i className="ri-download-line text-lg"></i>
-                                                    </Link>
-                                                </div>
-                                            </div>
+                                                ))
+                                            ) : (
+                                                <p className="font-light text-gray-500 dark:text-gray-400">
+                                                No files uploaded for this task.
+                                                </p>
+                                            )}
                                         </Tab.Panel>
                                     </Tab.Panels>
                                 </Tab.Group>
@@ -886,7 +1039,7 @@ const KanbanApp = () => {
                                 </button>
                             </div>
 
-                            <form className="px-4 py-8 overflow-y-auto" onSubmit={handleUpdateTask}>
+                            <form className="px-4 py-8 overflow-y-auto" onSubmit={handleUpdateTask} encType='multipart/form-data'>
                                 {/* Task Title */}
                                 <div className="mb-4">
                                     <FormInput name="title" label="Title" placeholder="Enter Title" type="text" containerClass="space-y-1.5 mb-6" className="form-input" key="title"  value={updateTaskForm?.data.title} errors={updateTaskForm?.errors} onChange={(e) => updateTaskForm.setData('title', e.target.value)} />
@@ -939,7 +1092,7 @@ const KanbanApp = () => {
                                     </FormInput>
                                 </div>
 
-                                {/* <div className="mb-4">
+                                <div className="mb-4">
                                     <label htmlFor="task-assignees" className="block mb-2 text-sm font-medium text-gray-600">
                                         Assignees
                                     </label>
@@ -961,9 +1114,57 @@ const KanbanApp = () => {
                                         ))}
                                     </select>
                                     <p className="text-xs text-gray-500 mt-1">Hold Ctrl (Cmd on Mac) to select multiple users.</p>
-                                </div> */}
+                                </div>
 
+                                <div className="mb-4">
+                                    {/* <input type="file"
+                                            name="files[]" multiple className="form-control" onChange={async (e) => { console.log(e.target.files); updateTaskForm.setData((datagg) => ({...datagg, files: e.target.files ? Array.from(e.target.files).map(x => x) : undefined}))}}/> */}
+                                    {/* <input type="file" multiple className="form-control" onChange={(e) => handleFileChange(e)}/> */}
+                                    <FileUploader icon="ri-upload-cloud-line text-4xl text-gray-300 dark:text-gray-200" text="Drop files here or click to upload." onFileUpload={handleTaskFileUpload}/>
+                                    {task?.media?.map((file:any, index : number) => (
+                                        // <div key={index}>
+                                        <div
+                                            key={file.id}
+                                            className="border rounded-md border-gray-300 dark:border-gray-700 p-3 mb-2 flex justify-between"
+                                        >
+                                            <div className="flex items-center gap-3">
+                                            {/* Display file type icon or thumbnail */}
+                                            {file.file_name.endsWith(".zip") ? (
+                                                <span className="flex items-center justify-center bg-primary text-white font-semibold rounded-md w-12 h-12">
+                                                .ZIP
+                                                </span>
+                                            ) : file.file_name.endsWith(".jpg") || file.file_name.endsWith(".png") ? (
+                                                <img
+                                                src={file.original_url}
+                                                alt={file.name}
+                                                className="h-12 w-12 rounded-md"
+                                                />
+                                            ) : file.file_name.endsWith(".mp4") ? (
+                                                <span className="flex items-center justify-center bg-secondary text-white font-semibold rounded-md w-12 h-12">
+                                                .MP4
+                                                </span>
+                                            ) : (
+                                                <span className="flex items-center justify-center bg-gray-500 text-white font-semibold rounded-md w-12 h-12">
+                                                ?
+                                                </span>
+                                            )}
+                                            {/* File details */}
+                                            <div>
+                                                <Link href={file.original_url} className="font-medium" target="_blank">
+                                                {file.name}
+                                                </Link>
+                                                {file.size && <p className="font-light">{file.size}</p>}
+                                            </div>
+                                            </div>
+                                            {/* Download link */}
+                                            <div className="flex justify-between items-center">
+                                                <button onClick={(e) => {e.preventDefault(); deleteFile(file.id)}}>Delete</button>
+                                            </div>
+                                        </div>
+                                        // </div>
+                                    ))}
 
+                                </div>
                                 {/* Submit Button */}
                                 <div className="flex justify-end">
                                     <button type="submit" className="btn bg-primary text-white btn-sm">
@@ -981,3 +1182,6 @@ const KanbanApp = () => {
 }
 
 export default KanbanApp
+
+
+

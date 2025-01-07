@@ -14,6 +14,8 @@ declare module '@inertiajs/core' {
         first_name: string;
         last_name: string;
         email_verified_at: string;
+        avatar_img: string;
+        avatar: string;
         // Add any other user-related fields here
       };
     };

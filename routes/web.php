@@ -93,6 +93,7 @@ Route::post('/email/resend', function (Request $request) {
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/dashboard', function () {
+        // dd(request()->user());
         return Inertia::render('dashboard/Analytics/index', [
             'message' => 'Hello from Laravel!',
         ]);
@@ -129,11 +130,17 @@ Route::get('/starter', function () {
     ]);
 });
 
+Route::get('/phpinfo', function () {
+    phpinfo();
+});
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/boards',[TaskController::class, 'index'])->name('boards.index');
-    Route::put('/boards/task/update/{id}', [TaskController::class, 'updateTask'])->name('boards.task.update');
+    Route::post('/boards/task/update/{id}', [TaskController::class, 'updateTask'])->name('boards.task.update');
     Route::post('/boards/update-tasks', [TaskController::class, 'updateTasks'])->name('boards.update-tasks');
     Route::delete('/boards/task/delete/{id}', [TaskController::class, 'destroy'])->name('boards.task.delete');
+
+
 });
 // Task Routes
 // Route::get('/items', [TaskController::class, 'index'])->name('items.index');
@@ -144,7 +151,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // Route::delete('/items/{item}', [TaskController::class, 'destroy'])->name('items.destroy');
 
 Route::middleware(['auth', 'verified'])->group(function () {
-Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
-Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
-Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+
+    Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
+    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
+    Route::post('/tasks/{task}/upload-file', [TaskController::class, 'uploadFile'])->name('tasks.uploadFile');
+    Route::post('/tasks/{task}/upload-files', [TaskController::class, 'uploadFiles'])->name('tasks.uploadFiles');
+    Route::delete('/tasks/delete-file/{mediaId}', [TaskController::class, 'deleteFile'])->name('tasks.deleteFile');
+    Route::patch('/tasks/{task}/archive', [TaskController::class, 'archive'])->name('tasks.archive');
+    Route::patch('/tasks/{task}/unarchive', [TaskController::class, 'unarchive'])->name('tasks.unarchive');
+
+    // Route::get('/tasks/{task}/edit', [TaskController::class, 'getTaskWithFiles'])->name('tasks.editWithFiles');
 });

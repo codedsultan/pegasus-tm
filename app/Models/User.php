@@ -13,11 +13,14 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Auth\Passwords\CanResetPassword as CanResetPasswordTrait;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
+class User extends Authenticatable implements MustVerifyEmail, CanResetPassword ,HasMedia
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable, CanResetPasswordTrait;
+    use InteractsWithMedia;
 
     /**
      * The attributes that are mass assignable.
@@ -56,7 +59,7 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
         ];
     }
 
-    protected $appends = ['avatar','fullname'];
+    protected $appends = ['avatar','fullname','avatar_img'];
     public function avatar(): Attribute
     {
         return Attribute::get(fn () => CreateAvatar::run($this->first_name, $this->email, null, null, 'initials'));
@@ -70,6 +73,20 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword
     public function tasks()
     {
         return $this->belongsToMany(Task::class, 'task_user');
+    }
+
+    // public function registerMediaConversions(?Media $media = null): void
+    // {
+    //     // Convert image to a thumbnail
+    //     return $this->addMediaConversion('thumb')
+    //         ->width(100)
+    //         ->height(100)
+    //         ->sharpen(10); // Optional sharpening to make the thumbnail clearer
+    // }
+
+    public function avatarImg(): Attribute
+    {
+        return Attribute::get(fn () => $this->getFirstMedia('avatars')?->getUrl());
     }
 
 }
