@@ -19,12 +19,15 @@ export interface TaskTypes {
     due_date: string
     description: string
 	category: string
-	comments: number
+	comments: any
     list_id: number
     order: number
     assignedTo: any
     assignees: any
     assignee_ids: any
+    files: any
+    media: any
+    comment_count: number
     user_avatar: {
 	// userAvatar: {
 		id: string

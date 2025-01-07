@@ -18,7 +18,7 @@ class CreateAvatar
         $encodedName = urlencode(ucfirst($name));
 
         if ($bgColor === null) {
-            $bgColor = substr($this->getColors($encodedName)['bgColor'], 1);
+            $bgColor = substr($this->getColors($encodedName ?? $name)['bgColor'], 1);
         }
 
         if ($color === null) {

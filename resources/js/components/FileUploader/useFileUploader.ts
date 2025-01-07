@@ -7,7 +7,7 @@ export default function useFileUploader(showPreview: boolean = true) {
 	/**
 	 * Handled the accepted files and shows the preview
 	 */
-	const handleAcceptedFiles = (files: FileType[], callback?: (files: FileType[]) => void) => {
+	const handleAcceptedFiles = (files: FileType[], callback?: (files: FileType[] ,emptyFilesAfterUpload?: boolean) => void) => {
 		var allFiles = files
 
 		if (showPreview) {
@@ -24,6 +24,8 @@ export default function useFileUploader(showPreview: boolean = true) {
 		}
 
 		if (callback) callback(allFiles)
+
+        setSelectedFiles([]);
 	}
 
 	/**

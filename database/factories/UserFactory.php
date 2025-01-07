@@ -6,6 +6,8 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Faker\Generator as Faker;
+
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -54,5 +56,23 @@ class UserFactory extends Factory
             ];
         });
     }
+
+    public function configure()
+    {
+        return $this->afterCreating(function (User $user) {
+            // $randomNumber = rand(1, 10); // Generates a random number between 1 and 10
+            if($user->id <= 10){
+                // $filePath = storage_path("app/public/uploads/users/avatar-1.jpg");
+
+                $filePath = url("uploads/users/avatar-{$user->id}.jpg");
+                // storage_path("app/public/uploads/users/avatar-{$user->id}.jpg");
+                $user->addMediaFromUrl($filePath)
+                ->toMediaCollection('avatars');
+            }
+            // Attach a predefined avatar to the user (use an existing file from storage)
+            // Media collection name
+        });
+    }
+
 
 }

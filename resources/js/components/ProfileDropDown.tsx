@@ -17,8 +17,9 @@ interface ProfileDropDownProps {
 }
 
 const ProfileDropDown = (props: ProfileDropDownProps) => {
-	const profilePic = props.profiliePic
+	// const profilePic = props.profiliePic
     const { auth } = usePage().props;
+    const profilePic = auth?.user?.avatar_img || auth?.user?.avatar;
 	const PopoverToggler = () => {
 		return (
 			<>

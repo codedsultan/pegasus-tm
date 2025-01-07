@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Board;
 use App\Models\Task;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -319,9 +320,25 @@ class TaskSeeder extends Seeder
         ];
 
         foreach ($tasks as $task) {
-            Task::create($task);
+            Task::factory($task)
+            // ->withFileUpload(fake())
+            ->create();
         }
 
+        Board::factory()
+            ->count(5)
+            ->create()
+            ->each(function ($project) use ($tasks) {
+                // Task::factory()->count(10)->create(['project_id' => $project->id]);
+                // Task::factory($task)->create(['project_id' => $project->id]);
+                foreach ($tasks as $task) {
+                    $task = array_merge($task, ['board_id' => $project->id]);
+                    unset($task['id']);
+                    Task::factory($task)
+                    // ->withFileUpload(fake())
+                    ->create();
+                }
+            });
         // Task::factory(20)->create();
     }
 }

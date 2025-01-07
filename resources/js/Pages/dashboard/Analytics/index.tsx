@@ -9,7 +9,7 @@ import TableCharts from './Components/TableCharts'
 import { PageBreadcrumb } from '../../../components'
 import DefaultLayout from '../../../layouts/Default';
 import VerticalLayout from '../../../layouts/Vertical';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link ,usePage } from '@inertiajs/react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../../redux/store';
 // interface DefaultLayoutProps {
@@ -34,6 +34,7 @@ const { layoutTheme, layoutDirection, layoutWidth, topBarTheme, sideBarTheme, si
     // isOpenRightSideBar: state.Layout.isOpenRightSideBar,
 }
 const Analytics = () => {
+    const { auth } = usePage().props;
     const props: any = {
         title: 'Dasboard',
         description: 'Attex React is a free and open-source admin dashboard template built with React and Tailwind CSS. It is designed to be easily customizable and includes a wide range of features and components to help you build your own dashboard quickly and efficiently.',
@@ -52,7 +53,7 @@ const Analytics = () => {
 		<>
             <VerticalLayout {...props}>
                 {/* <PageBreadcrumb title="Analytics" subName="Menu" /> */}
-
+                {/* <pre>{JSON.stringify(auth?.user, null, 2)}</pre> */}
                 <div className="grid xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 gap-6 mb-6">
                     <Statistics />
                     <SessionsByBrowser />
