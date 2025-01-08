@@ -28,19 +28,49 @@ class CommentController extends Controller
     // Store a new comment
     public function store(Request $request)
     {
+        // dd($request->all());
         $request->validate([
             'content' => 'required|string',
             'task_id' => 'required|integer',
             'parent_id' => 'nullable|integer',
+            'attachments.*' => 'file|max:5120'
         ]);
 
         $comment = Comment::create([
             'user_id' => $request->user->id,
             'task_id' => $request->task_id,
+            // 'commentable_id' => $request->input('commentable_id'),
+            // 'commentable_type' => $request->input('commentable_type'),
             'parent_id' => $request->parent_id,
             'content' => $request->content,
         ]);
 
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $comment->addMedia($file)->toMediaCollection('attachments');
+            }
+        }
+        // return response()->json($comment, 201);
+        return redirect()->back()->with('success', 'Comment created successfully.');
+    }
+
+    public function storeReply(Comment $comment, Request $request)
+    {
+        $request->validate([
+            'content' => 'required|string',
+            'attachments.*' => 'file|max:5120'
+        ]);
+
+        $comment->replies()->create([
+            'user_id' => $request->user->id,
+            'content' => $request->content,
+        ]);
+
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $comment->replies()->addMedia($file)->toMediaCollection('attachments');
+            }
+        }
         // return response()->json($comment, 201);
         return redirect()->back()->with('success', 'Comment created successfully.');
     }
