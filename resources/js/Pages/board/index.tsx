@@ -36,6 +36,8 @@ interface CommentFormState {
     taskId?: number;
     parentId?: number;
     isReply?: boolean;
+    repliedTo?: number;
+    quotedUser?: string;
 }
 interface FileWithPreview extends File {
     preview?: string;
@@ -114,7 +116,6 @@ const KanbanApp = () => {
 	})
 	const [totalTasks, setTotalTasks] = useState<number>(tasks.length)
 	const [newTaskModal, setNewTaskModal] = useState<boolean>(false)
-	// const [descriptionModal, setDescriptionModal] = useState<boolean>(false)
 	const [newTaskDetails, setNewTaskDetails] = useState<any>(null)
 
 
@@ -196,10 +197,12 @@ const KanbanApp = () => {
 
     const { task } = usePage<{ task: TaskTypes | null }>().props;
     const currentUrl = new URL(window.location.href);
-    var isCurrentTask: boolean = currentUrl.searchParams.get('task')?.toString() === task?.id?.toString() && currentUrl.searchParams.get('task')?.toString() !== undefined && currentUrl.searchParams.get('update')?.toString() === undefined;
+    // var isCurrentTask: boolean = currentUrl.searchParams.get('task')?.toString() === task?.id?.toString() && currentUrl.searchParams.get('task')?.toString() !== undefined && currentUrl.searchParams.get('update')?.toString() === undefined;
+    // var isCurrentUpdateTask: boolean = currentUrl.searchParams.get('update')?.toString() === task?.id?.toString() && currentUrl.searchParams.get('update')?.toString() !== undefined;
+    var isCurrentTask: boolean =  currentUrl.searchParams.get('task')?.toString() !== undefined && currentUrl.searchParams.get('update')?.toString() === undefined;
     var isCurrentUpdateTask: boolean = currentUrl.searchParams.get('update')?.toString() === task?.id?.toString() && currentUrl.searchParams.get('update')?.toString() !== undefined;
 
-    console.log('is current task ::' + isCurrentTask + 'searchParams ::' + currentUrl.searchParams.get('task')?.toString() + 'Task id::' + task?.id?.toString());
+    console.log('is current task ::' + isCurrentTask + '--searchParams ::' + currentUrl.searchParams.get('task')?.toString() + 'Task id::' + task?.id?.toString() + Date.now());
     // const [isOpen, setIsOpen] = useState(isCurrenTask);
     // const [currentTask, setCurrentTask] = useState(null);
 
@@ -376,6 +379,7 @@ const KanbanApp = () => {
 
 
         e.preventDefault();
+
 
 
         console.log('in handleUpdateTask ::' + 'task :' + task);
@@ -593,13 +597,41 @@ const KanbanApp = () => {
     const [commentForm, setCommentForm] = useState<CommentFormState>({
         content: '',
         errors: {},
-        taskId: task?.id,
+        // taskId: task?.id,
         parentId: undefined,
+        isReply: false,
+        repliedTo: undefined,
+        quotedUser: '',
         attachments: [],
     });
 
     const [selectedCommentFiles, setSelectedCommentFiles] = useState<FileWithPreview[]>([]);
+    const [replyingTo, setReplyingTo] = useState(null);
 
+    const [childreplyingTo, setChildReplyingTo] = useState(null);
+
+    const handleChildReplyingTo = (commentId: number, repliedTo: number, quotedUser: string) => {
+        // e.preventDefault();
+
+        console.log('in handleChildReplyingTo ::' + 'commentId:' + commentId + ' repliedTo:' + repliedTo + ' quotedUser:' + quotedUser);
+
+        setChildReplyingTo(commentId as any);
+
+        setCommentForm({
+            ...commentForm,
+            repliedTo: repliedTo,
+            quotedUser: quotedUser,
+            parentId: commentId,
+        });
+
+        handleSendComment(commentId, repliedTo, quotedUser);
+    };
+    // useEffect(() => {
+    //     // setCommentForm((prev) => ({
+    //     //     ...prev,
+    //     //     repliedTo: childreplyingTo,
+    //     // }));
+    // }, [childreplyingTo]);
     const updateComment = (key: string, value: any) => {
         setCommentForm((prev) => ({
         ...prev,
@@ -648,52 +680,78 @@ const KanbanApp = () => {
         }));
       };
 
-      const handleReply = (parentId: number) => {
+    const handleReply = (parentId: number) => {
         setCommentForm({
             ...commentForm,
             parentId,
+
         });
     };
 
 
 
-    const handleSendComment = (e: React.FormEvent, parentId?: number) => {
-        e.preventDefault();
+    const handleSendComment = ( parentId?: number ,repliedTo?: number ,quotedUser?: string ) => {
+        // e.preventDefault();
 
         const formData = new FormData();
         formData.append('content', commentForm.content);
-        if (commentForm.taskId) {
-            formData.append('task_id', commentForm.taskId.toString());
+        if (task?.id) {
+            formData.append('task_id', task?.id.toString());
+            // formData.append('task_id', commentForm.taskId.toString());
         }
 
-        if (commentForm.parentId) {
-            formData.append('parent_id', commentForm.parentId.toString());
+        if (repliedTo) {
+            formData.append('replied_to', repliedTo?.toString());
+            // formData.append('replied_to', commentForm.repliedTo.toString());
+            // formData.append('is_reply', commentForm.isReply.toString());
         }
+
+        if (quotedUser) {
+            formData.append('quoted_user', quotedUser);
+        }
+
+        if (parentId) {
+            formData.append('parent_id', parentId.toString());
+        }
+        // if (commentForm.parentId) {
+        //     formData.append('parent_id', commentForm.parentId.toString());
+        // }
+        // if (!commentForm.repliedTo)) {
+
+        // }
         selectedCommentFiles.forEach((file, index) => {
             formData.append(`attachments[${index}]`, file);
         });
 
 
 
-
+        // setDescriptionModal(true);
         router.post(route('comments.store'), formData, {
+            // errorBag: 'createComment',
+            // dd();
           headers: {
             'Content-Type': 'multipart/form-data',
           },
-          onError: (error) => {
-            console.error('Error submitting comment:', error);
-            setCommentForm((prev) => ({
-                ...prev,
-                errors: errors,
-              }));
-          },
+        //   preserveScroll: true,
+          preserveState: true,
+        //   onError: (error) => {
+        //     console.error('Error submitting comment:', error);
+        //     setCommentForm((prev) => ({
+        //         ...prev,
+        //         errors: errors,
+        //       }));
+        //   },
+
           onFinish: () => {
-            setCommentForm({
-                content: '',
-                errors: {},
-                attachments: [],
-              });
-              setSelectedCommentFiles([]);
+            // setDescriptionModal(true);
+             console.log('Comment submitted successfully!');
+            // setCommentForm({
+            //     content: '',
+            //     errors: {},
+            //     attachments: [],
+            // });
+            //   setSelectedCommentFiles([]);
+            //   setReplyingTo(null);
             // console.log('Comment submitted successfully!');
           },
         });
@@ -723,7 +781,107 @@ const KanbanApp = () => {
     //       console.error('Error submitting comment:', error);
     //     }
       };
-      const [replyingTo, setReplyingTo] = useState(null);
+      const renderComments = (comments:any) => {
+        return  comments.map((comment:any, idx:number) => (
+                <div key={idx} className="flex gap-5 border rounded-md border-gray-300 dark:border-gray-700 p-3 mb-2">
+                    <img src={comment.user?.avatar_img || comment.user?.avatar} alt="" className="h-12 rounded-full" />
+                    <div className="w-full">
+                        <h5 className="mb-2 text-gray-500 dark:text-gray-400 font-semibold">{comment.user?.fullname}</h5>
+                        <p className="font-light mb-2">{comment.content}</p>
+                        <button
+                            onClick={() => setReplyingTo(comment.id)}
+                            className="text-sm text-blue-500"
+                        >
+                            Reply
+                        </button>
+                        {comment.replies?.length > 0 ? (
+                            comment.replies.map((reply:any, idx:number) => (
+                            <div key={idx} className="flex gap-5 border rounded-md border-gray-300 dark:border-gray-700 p-3 mb-2">
+                                <img src={reply.user?.avatar_img || reply.user?.avatar} alt="" className="h-12 rounded-full" />
+                                <div className="w-full">
+                                    <h5 className=" text-gray-500 dark:text-gray-400 font-semibold">{reply.user?.fullname}</h5>
+                                    <p className="font-light mb-2">{ reply.quoted_user ? ('@ '+ reply.quoted_user + ' : ' + reply.content ): reply.content}</p>
+                                </div>
+                                {/* ChildReply Form */}
+                                {childreplyingTo === reply.id && (
+                                    // <form
+                                    //     className="mt-2 ml-6"
+                                    // >
+                                    <>
+                                        <textarea
+                                            className="form-input w-full p-2 border rounded"
+                                            placeholder="Write your reply..."
+                                            rows={2}
+                                            value={commentForm.content}
+                                            onChange={(e) =>
+                                                setCommentForm({
+                                                    ...commentForm,
+                                                    content: e.target.value,
+                                                })
+                                            }
+                                        ></textarea>
+                                        <div className="flex justify-end mt-2">
+                                            <button
+                                                type="button"
+                                                onClick={() =>  handleChildReplyingTo(comment.id, reply.id, reply.user?.fullname)}
+                                                className="btn btn-sm bg-primary text-white"
+                                            >
+                                                Submit Reply
+                                            </button>
+                                        </div>
+                                    </>
+                                    // </form>
+                                )}
+                                <button
+                                    onClick={() => setChildReplyingTo(reply.id)}
+                                    className="text-sm text-blue-500"
+                                >
+                                    Reply
+                                </button>
+                            </div>
+                            ))
+                        ) : (
+                            <p className="font-light text-gray-500 dark:text-gray-400">
+                                No replies for this comment.
+                            </p>
+                        )}
+
+                        {/* Reply Form */}
+                        {replyingTo === comment.id && (
+                            // <form
+                            //     className="mt-2 ml-6"
+                            // >
+                            <>
+                                <textarea
+                                    className="form-input w-full p-2 border rounded"
+                                    placeholder="Write your reply..."
+                                    rows={2}
+                                    value={commentForm.content}
+                                    onChange={(e) =>
+                                        setCommentForm({
+                                            ...commentForm,
+                                            content: e.target.value,
+                                        })
+                                    }
+                                ></textarea>
+                                <div className="flex justify-end mt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => handleSendComment( comment.parent_id || comment.id, comment.id)}
+                                        className="btn btn-sm bg-primary text-white"
+                                    >
+                                        Submit Reply
+                                    </button>
+                                </div>
+                            </>
+                            // </form>
+                        )}
+                    </div>
+                </div>
+            )
+        );
+      };
+
 	return (
 		<>
             <VerticalLayout {...props}>
@@ -1044,7 +1202,7 @@ const KanbanApp = () => {
                                     <Tab.Panels className="mt-5 overflow-hidden">
                                         <Tab.Panel className="transition-all duration-300 transform">
                                             {/* <textarea className="form-input mt-2" id="example-textarea" placeholder="Write message" rows={4}></textarea> */}
-                                            <form className="overflow-y-auto" onSubmit={handleSendComment} encType='multipart/form-data'>
+                                            <form className="overflow-y-auto"  encType='multipart/form-data'>
                                                 <FormInput name="commentContent" label="" type="textarea" containerClass="w-full" className="form-input" rows={3} key="commentContent" value={commentForm?.content} errors={commentForm?.errors} onChange={(e) => updateComment('content', e.target.value)} />
                                                 <div className="mb-2">
                                                     {selectedCommentFiles.length > 0 && (
@@ -1080,7 +1238,7 @@ const KanbanApp = () => {
                                                         <label htmlFor="fileInput" className="btn btn-link text-xl cursor-pointer">
                                                             <i className="ri-attachment-2"></i>
                                                         </label>
-                                                        <button type="submit" className="btn bg-primary text-white btn-sm">
+                                                        <button type="button" onClick={() => handleSendComment()}  className="btn bg-primary text-white btn-sm">
                                                             Submit
                                                         </button>
                                                     </div>
@@ -1115,67 +1273,8 @@ const KanbanApp = () => {
                                                 )} */}
                                             </form>
                                             {comments?.length > 0 ? (
-                                                comments.map((comment:any, idx:number) => (
-                                                <div key={idx} className="flex gap-5 border rounded-md border-gray-300 dark:border-gray-700 p-3 mb-2">
-                                                    <img src={comment.user?.avatar_img || comment.user?.avatar} alt="" className="h-12 rounded-full" />
-                                                    <div className="w-full">
-                                                        <h5 className="mb-2 text-gray-500 dark:text-gray-400 font-semibold">{comment.user?.fullname}</h5>
-                                                        <p className="font-light mb-2">{comment.content}</p>
-                                                        <button
-                                                            onClick={() => setReplyingTo(comment.id)}
-                                                            className="text-sm text-blue-500"
-                                                        >
-                                                            Reply
-                                                        </button>
-                                                        {comment.replies?.length > 0 ? (
-                                                            comment.replies.map((reply:any, idx:number) => (
-                                                            <div key={idx} className="flex gap-5 border rounded-md border-gray-300 dark:border-gray-700 p-3 mb-2">
-                                                                <img src={reply.user?.avatar_img || reply.user?.avatar} alt="" className="h-12 rounded-full" />
-                                                                <div className="w-full">
-                                                                    <h5 className=" text-gray-500 dark:text-gray-400 font-semibold">{reply.user?.fullname}</h5>
-                                                                    <p className="font-light mb-2">{reply.content}</p>
-                                                                </div>
-                                                            </div>
-                                                            ))
-                                                        ) : (
-                                                            <p className="font-light text-gray-500 dark:text-gray-400">
-                                                                No replies for this comment.
-                                                            </p>
-                                                        )}
-
-                                                        {/* Reply Form */}
-                                                        {replyingTo === comment.id && (
-                                                            <form
-                                                                onSubmit={(e) => handleSendComment(e, comment.id)}
-                                                                className="mt-2 ml-6"
-                                                            >
-                                                                <textarea
-                                                                    className="form-input w-full p-2 border rounded"
-                                                                    placeholder="Write your reply..."
-                                                                    rows={2}
-                                                                    value={commentForm.content}
-                                                                    onChange={(e) =>
-                                                                        setCommentForm({
-                                                                            ...commentForm,
-                                                                            content: e.target.value,
-                                                                        })
-                                                                    }
-                                                                ></textarea>
-                                                                <div className="flex justify-end mt-2">
-                                                                    <button
-                                                                        type="submit"
-                                                                        className="btn btn-sm bg-primary text-white"
-                                                                    >
-                                                                        Submit Reply
-                                                                    </button>
-                                                                </div>
-                                                            </form>
-                                                        )}
-                                                    </div>
-
-                                                </div>
-                                                )
-                                            ) ): (
+                                                renderComments(comments)
+                                            ): (
                                             <p className="font-light text-gray-500 dark:text-gray-400">
                                                 No comments for this task.
                                             </p>

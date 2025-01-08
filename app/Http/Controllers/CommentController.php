@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Comment;
+use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Inertia\Inertia;
 
 class CommentController extends Controller
 {
@@ -28,21 +32,27 @@ class CommentController extends Controller
     // Store a new comment
     public function store(Request $request)
     {
-        // dd($request->all());
-        $request->validate([
+        $validated = $request->validate([
             'content' => 'required|string',
             'task_id' => 'required|integer',
             'parent_id' => 'nullable|integer',
-            'attachments.*' => 'file|max:5120'
-        ]);
+            'attachments.*' => 'file|max:5120',
+            'replied_to' => 'nullable|exists:comments,id',
+            'quoted_user' => 'nullable|string',
 
+        ]);
+        // dd( $request->user()->id);
+        // dd($request->quotedUser);
         $comment = Comment::create([
-            'user_id' => $request->user->id,
+            'user_id' => $request->user()->id,
             'task_id' => $request->task_id,
             // 'commentable_id' => $request->input('commentable_id'),
             // 'commentable_type' => $request->input('commentable_type'),
-            'parent_id' => $request->parent_id,
+            'parent_id' => $request->parent_id?? null,
             'content' => $request->content,
+            'replied_to' => $request->replied_to ?? null,
+            'quoted_user' => $request->quoted_user ?? null,
+
         ]);
 
         if ($request->hasFile('attachments')) {
@@ -50,8 +60,25 @@ class CommentController extends Controller
                 $comment->addMedia($file)->toMediaCollection('attachments');
             }
         }
-        // return response()->json($comment, 201);
-        return redirect()->back()->with('success', 'Comment created successfully.');
+
+        $task = Task::findOrFail($request->task_id);
+        $task->assignees()->sync($request->assignees);
+
+        return redirect()->back()->with([
+            'success' => 'Task updated successfully.',
+            // 'task' => $task,
+            // 'assignees' => $task->assignees,
+            // ['task', 'assignees'],
+        ]);
+        // return redirect()->back()->with([
+        //     'success' => 'Task updated successfully.',
+        //     'task' => $task,
+        //     'assignees' => $task->assignees,
+        //     // ['task', 'assignees'],
+        // ]);
+
+
+        // return redirect()->back()->with('success', 'Comment created successfully.');
     }
 
     public function storeReply(Comment $comment, Request $request)
@@ -86,9 +113,28 @@ class CommentController extends Controller
         }
 
         $comment->delete();
+        // $assignees = $task->assignees()->get();
+
+
 
         return redirect()->back()->with('success', 'Comment deleted successfully.');
         // return response()->json(['message' => 'Comment deleted']);
     }
 
+
+
+
+    // public function failedValidation(Validator $validator)
+    // {
+    //     throw new HttpResponseException(
+    //         redirect()->back()->with([
+    //             'message' => 'Validation errors occurred.',
+    //             'errors' => $validator->errors()
+    //         ])
+    //         // response()->json([
+    //         //     'message' => 'Validation errors occurred.',
+    //         //     'errors' => $validator->errors()
+    //         // ], 422)
+    //     );
+    // }
 }
