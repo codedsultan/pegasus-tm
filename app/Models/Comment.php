@@ -38,4 +38,10 @@ class Comment extends Model
         return $this->hasMany(Comment::class, 'parent_id');
     }
 
+    // for polymorphic relationships (tasks, projects, etc.)
+    // public function commentable()
+    // {
+    //     return $this->morphTo();
+    // }
+
 }

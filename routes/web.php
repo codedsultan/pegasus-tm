@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -162,4 +163,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/tasks/{task}/unarchive', [TaskController::class, 'unarchive'])->name('tasks.unarchive');
 
     // Route::get('/tasks/{task}/edit', [TaskController::class, 'getTaskWithFiles'])->name('tasks.editWithFiles');
+});
+
+
+Route::middleware('auth')->group(function () {
+    Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+    Route::get('/comments/{comment}', [CommentController::class, 'show'])->name('comments.show');
+    Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+    Route::get('/comments/{comment}/replies', [CommentController::class, 'getReplies'])->name('comments.getReplies');
+    Route::post('/comments/{comment}/replies', [CommentController::class, 'storeReply'])->name('comments.storeReply');
 });

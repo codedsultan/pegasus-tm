@@ -11,13 +11,6 @@ import { useForm ,router} from '@inertiajs/react';
 
 import TaskItem from './TaskItem'
 
-//image
-import avatar1 from '@/assets/images/users/avatar-1.jpg'
-import avatar3 from '@/assets/images/users/avatar-3.jpg'
-import avatar4 from '@/assets/images/users/avatar-4.jpg'
-import avatar5 from '@/assets/images/users/avatar-5.jpg'
-import Img1 from '@/assets/images/small/small-1.jpg'
-
 // components
 import { FormInput, CustomDatepicker, PageBreadcrumb ,FileUploader} from '../../components'
 import { ModalLayout } from '../../components/HeadlessUI'
@@ -33,6 +26,54 @@ interface StateType {
 	reviewTasks: TaskTypes[]
 	doneTasks: TaskTypes[]
 }
+
+interface CommentFormState {
+    content: string; // The main content of the comment
+    errors: Record<string, string>; // A dictionary for form field errors
+    attachments: File[]; // An array of attached files
+    // 'task_id' => 'required|integer',
+    //         'parent_id' => 'nullable|integer',
+    taskId?: number;
+    parentId?: number;
+    isReply?: boolean;
+}
+interface FileWithPreview extends File {
+    preview?: string;
+}
+
+interface TaskFormData {
+    title?: string;
+    description?: string;
+    assignees: string[];
+    assignTo?: string;
+    dueDate?: Date;
+    status?: string;
+    priority?: string;
+    files?: any[] ;
+
+    // Define 'assignees' as an array of strings
+}
+
+interface Comment {
+    id: number;
+    content: string;
+    user: {
+      id: number;
+      name: string;
+      avatarUrl?: string;
+    };
+    parentId?: number;
+    taskId?: number;
+    attachments?: {
+      id: number;
+      fileName: string;
+      fileUrl: string;
+      fileType: string;
+    }[];
+    createdAt: string;
+    updatedAt?: string;
+    replies?: Comment[];
+  }
 
 
 const KanbanApp = () => {
@@ -165,18 +206,7 @@ const KanbanApp = () => {
     const [descriptionModal, setDescriptionModal] = useState<boolean>(isCurrentTask)
     const [updateTaskModal, setUpdateTaskModal] = useState<boolean>(false)
 
-    interface TaskFormData {
-        title?: string;
-        description?: string;
-        assignees: string[];
-        assignTo?: string;
-        dueDate?: Date;
-        status?: string;
-        priority?: string;
-        files?: any[] ;
 
-        // Define 'assignees' as an array of strings
-    }
     // const [selectedFiles, setSelectedFiles] = useState<FileType[]>([])
     const updateTaskForm = useForm<TaskFormData>({
         title: '',
@@ -268,18 +298,18 @@ const KanbanApp = () => {
     //         files : files,
     //     });// Update state with selected files
     // };
-    const handleFileUpload = (xfiles: any[]) => {
+    // const handleFileUpload = (xfiles: any[]) => {
         // updateTaskForm.setData('files', files);
         // setSelectedFiles(files)
-        const formData = new FormData();
-        xfiles.forEach((file, index) => {
-            console.log('File:', file.formattedSize);
-            formData.append(`files[${index}]`, file.formattedSize); // Add files to FormData
-        });
-        updateTaskForm.setData((data:any) => ({
-            ...data,
-            files: formData,
-        }));
+        // const formData = new FormData();
+        // xfiles.forEach((file, index) => {
+        //     console.log('File:', file.formattedSize);
+        //     formData.append(`files[${index}]`, file.formattedSize); // Add files to FormData
+        // });
+        // updateTaskForm.setData((data:any) => ({
+        //     ...data,
+        //     files: formData,
+        // }));
 
         // setFiles([...e.target.files]);
 
@@ -293,10 +323,10 @@ const KanbanApp = () => {
         // updateTaskForm.setData('files', formData);
         // updateTaskForm.data.formData = formData;
         // updateTaskForm.refresh();
-        console.log('Uploaded files:', xfiles);
+        // console.log('Uploaded files:', xfiles);
 
         // You can process files here, e.g., send to server
-    };
+    // };
     const toggleUpdateTaskModal = (task:any) => {
         updateTaskForm.clearErrors();
         // console.log('in handleUpdateTask ::' + 'task :' + updateTaskForm?.data?.title);
@@ -558,6 +588,142 @@ const KanbanApp = () => {
       useEffect(() => {
         setComments(task?.comments);
       }, [task?.comments]);
+
+
+    const [commentForm, setCommentForm] = useState<CommentFormState>({
+        content: '',
+        errors: {},
+        taskId: task?.id,
+        parentId: undefined,
+        attachments: [],
+    });
+
+    const [selectedCommentFiles, setSelectedCommentFiles] = useState<FileWithPreview[]>([]);
+
+    const updateComment = (key: string, value: any) => {
+        setCommentForm((prev) => ({
+        ...prev,
+        [key]: value,
+        }));
+    };
+
+    const handleCommentFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        // const files = Array.from(e.target.files);
+        // setSelectedCommentFiles((prev) => [...prev, ...files]);
+        // if (e.target.files) {
+        if (!e.target.files) return;
+        // const files = Array.from(e.target.files) as File[];
+        const files = Array.from(e.target.files) as FileWithPreview[];
+        // setSelectedCommentFiles(files);
+        // setSelectedCommentFiles([...files]);
+        // setSelectedCommentFiles((prev: File[]) => [...prev, ...files]);
+        // Optional: Add preview URLs for images
+
+        const filesWithPreview = files.map((file) => {
+            if (file.type.startsWith('image/')) {
+              file.preview = URL.createObjectURL(file);
+            }
+            return file;
+        });
+        setSelectedCommentFiles((prev: File[]) => [...prev, ...filesWithPreview]);
+        // setSelectedCommentFiles([...filesWithPreview]);
+        setCommentForm((prev) => ({
+            ...prev,
+            attachments: selectedCommentFiles,
+          }));
+        // setCommentForm((prev: { content: string; errors: {}; attachments: FileWithPreview[] }) => ({
+        //   ...prev,
+        //   attachments: [...prev.attachments, ...filesWithPreview],
+        // }));
+        // }
+      };
+
+      const removeCommentFile = (index: number) => {
+        const updatedCommentFiles = selectedCommentFiles.filter((_, i) => i !== index);
+        setSelectedCommentFiles(updatedCommentFiles);
+
+        setCommentForm((prev) => ({
+          ...prev,
+          attachments: updatedCommentFiles,
+        }));
+      };
+
+      const handleReply = (parentId: number) => {
+        setCommentForm({
+            ...commentForm,
+            parentId,
+        });
+    };
+
+
+
+    const handleSendComment = (e: React.FormEvent, parentId?: number) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        formData.append('content', commentForm.content);
+        if (commentForm.taskId) {
+            formData.append('task_id', commentForm.taskId.toString());
+        }
+
+        if (commentForm.parentId) {
+            formData.append('parent_id', commentForm.parentId.toString());
+        }
+        selectedCommentFiles.forEach((file, index) => {
+            formData.append(`attachments[${index}]`, file);
+        });
+
+
+
+
+        router.post(route('comments.store'), formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          onError: (error) => {
+            console.error('Error submitting comment:', error);
+            setCommentForm((prev) => ({
+                ...prev,
+                errors: errors,
+              }));
+          },
+          onFinish: () => {
+            setCommentForm({
+                content: '',
+                errors: {},
+                attachments: [],
+              });
+              setSelectedCommentFiles([]);
+            // console.log('Comment submitted successfully!');
+          },
+        });
+
+    //     try {
+    //       const response = await fetch('/api/comments', {
+    //         method: 'POST',
+    //         body: formData,
+    //       });
+
+    //       if (!response.ok) {
+    //         const errorData = await response.json();
+    //         setCommentForm((prev) => ({
+    //           ...prev,
+    //           errors: errorData.errors,
+    //         }));
+    //       } else {
+    //         // Clear the form on successful submission
+    //         setCommentForm({
+    //           content: '',
+    //           errors: {},
+    //           attachments: [],
+    //         });
+    //         setSelectedCommentFiles([]);
+    //       }
+    //     } catch (error) {
+    //       console.error('Error submitting comment:', error);
+    //     }
+      };
+      const [replyingTo, setReplyingTo] = useState(null);
 	return (
 		<>
             <VerticalLayout {...props}>
@@ -818,7 +984,7 @@ const KanbanApp = () => {
 
                                                 {(task?.assignees || []).map((assignee:any, idx:number) => (
                                                 // <>
-                                                    <div className="-me-3">
+                                                    <div key={idx} className="-me-3">
                                                         <Link key={idx} href={assignee.avatar} target="_blank">
                                                             <img src={assignee.avatar_img || assignee.avatar} alt="" className="rounded-full h-8 w-8 hover:-translate-y-0.5 transition-all duration-200" />
                                                         </Link>
@@ -877,19 +1043,77 @@ const KanbanApp = () => {
 
                                     <Tab.Panels className="mt-5 overflow-hidden">
                                         <Tab.Panel className="transition-all duration-300 transform">
-                                            <textarea className="form-input mt-2" id="example-textarea" placeholder="Write message" rows={4}></textarea>
-                                            <div className="flex items-center justify-end">
-                                                <div className="mb-2 inline-block">
-                                                    <button type="button" className="btn btn-link text-xl">
-                                                        <i className="ri-attachment-2"></i>
-                                                    </button>
+                                            {/* <textarea className="form-input mt-2" id="example-textarea" placeholder="Write message" rows={4}></textarea> */}
+                                            <form className="overflow-y-auto" onSubmit={handleSendComment} encType='multipart/form-data'>
+                                                <FormInput name="commentContent" label="" type="textarea" containerClass="w-full" className="form-input" rows={3} key="commentContent" value={commentForm?.content} errors={commentForm?.errors} onChange={(e) => updateComment('content', e.target.value)} />
+                                                <div className="mb-2">
+                                                    {selectedCommentFiles.length > 0 && (
+                                                        <div className="mt-4 flex items-center gap-2">
+                                                            {selectedCommentFiles.map((file:any, index:number) => (
+                                                                <div key={index} className="flex items-center  ">
+                                                                    {/* <span>{file.name}</span> */}
+
+                                                                    {file.preview && <img className="border rounded-md border-gray-200 p-1" src={file.preview} alt={file.name} width={40} />}
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => removeCommentFile(index)}
+                                                                        className="text-red-500 hover:text-red-700"
+                                                                    >
+                                                                        <i className="ri-close-line"></i>
+                                                                    </button>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                <div className="mb-2 inline-block">
-                                                    <button type="button" className="btn bg-primary text-white btn-sm">
-                                                        Submit
-                                                    </button>
+                                                <div className="flex items-center justify-end">
+
+
+                                                    <div className="mb-2 inline-block">
+                                                        <input
+                                                            type="file"
+                                                            multiple
+                                                            onChange={handleCommentFileChange}
+                                                            className="hidden"
+                                                            id="fileInput"
+                                                        />
+                                                        <label htmlFor="fileInput" className="btn btn-link text-xl cursor-pointer">
+                                                            <i className="ri-attachment-2"></i>
+                                                        </label>
+                                                        <button type="submit" className="btn bg-primary text-white btn-sm">
+                                                            Submit
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                            </div>
+                                                {/* <div className="flex items-center justify-end">
+                                                    <div className="mb-2 inline-block">
+                                                        <button type="button" className="btn btn-link text-xl">
+                                                            <i className="ri-attachment-2"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div className="mb-2 inline-block">
+                                                        <button type="submit" className="btn bg-primary text-white btn-sm">
+                                                            Submit
+                                                        </button>
+                                                    </div>
+                                                </div> */}
+                                                {/* {selectedCommentFiles.length > 0 && (
+                                                    <div className="mt-4">
+                                                    {selectedCommentFiles.map((file:any, index:number) => (
+                                                        <div key={index} className="flex items-center gap-2">
+                                                        <span className="text-gray-600">{file.name}</span>
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeCommentFile(index)}
+                                                            className="text-red-500 hover:text-red-700"
+                                                        >
+                                                            <i className="ri-close-line"></i>
+                                                        </button>
+                                                        </div>
+                                                    ))}
+                                                    </div>
+                                                )} */}
+                                            </form>
                                             {comments?.length > 0 ? (
                                                 comments.map((comment:any, idx:number) => (
                                                 <div key={idx} className="flex gap-5 border rounded-md border-gray-300 dark:border-gray-700 p-3 mb-2">
@@ -897,6 +1121,12 @@ const KanbanApp = () => {
                                                     <div className="w-full">
                                                         <h5 className="mb-2 text-gray-500 dark:text-gray-400 font-semibold">{comment.user?.fullname}</h5>
                                                         <p className="font-light mb-2">{comment.content}</p>
+                                                        <button
+                                                            onClick={() => setReplyingTo(comment.id)}
+                                                            className="text-sm text-blue-500"
+                                                        >
+                                                            Reply
+                                                        </button>
                                                         {comment.replies?.length > 0 ? (
                                                             comment.replies.map((reply:any, idx:number) => (
                                                             <div key={idx} className="flex gap-5 border rounded-md border-gray-300 dark:border-gray-700 p-3 mb-2">
@@ -911,6 +1141,35 @@ const KanbanApp = () => {
                                                             <p className="font-light text-gray-500 dark:text-gray-400">
                                                                 No replies for this comment.
                                                             </p>
+                                                        )}
+
+                                                        {/* Reply Form */}
+                                                        {replyingTo === comment.id && (
+                                                            <form
+                                                                onSubmit={(e) => handleSendComment(e, comment.id)}
+                                                                className="mt-2 ml-6"
+                                                            >
+                                                                <textarea
+                                                                    className="form-input w-full p-2 border rounded"
+                                                                    placeholder="Write your reply..."
+                                                                    rows={2}
+                                                                    value={commentForm.content}
+                                                                    onChange={(e) =>
+                                                                        setCommentForm({
+                                                                            ...commentForm,
+                                                                            content: e.target.value,
+                                                                        })
+                                                                    }
+                                                                ></textarea>
+                                                                <div className="flex justify-end mt-2">
+                                                                    <button
+                                                                        type="submit"
+                                                                        className="btn btn-sm bg-primary text-white"
+                                                                    >
+                                                                        Submit Reply
+                                                                    </button>
+                                                                </div>
+                                                            </form>
                                                         )}
                                                     </div>
 
