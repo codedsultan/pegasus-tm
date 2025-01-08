@@ -34,13 +34,15 @@ class TaskController extends Controller
             'title' => 'Task Board',
             'description' => 'Attex React is a free and open-source admin dashboard template built with React and Tailwind CSS. It is designed to be easily customizable and includes a wide range of features and components to help you build your own dashboard quickly and efficiently.',
             'tasks' => $tasks,
-            'task' => Inertia::defer(
-                fn () => $request->has('task') ? $task?->load(['assignees','media','comments.user','comments.replies.user']) : null
-            ),
+            'task' =>
+            // Inertia::defer(
+                fn () => $request->has('task') ? $task?->load(['assignees','media','comments.user','comments.replies.user']) : null,
+            // ),
 
-            'assignees' => Inertia::defer(
+            'assignees' =>
+            // Inertia::defer(
                 fn () => $request->has('task') ? $assignees : null
-            ),
+            // ),
         ]);
     }
 
@@ -117,6 +119,7 @@ class TaskController extends Controller
             'assignTo' => 'nullable|exists:users,id',
             'assignees' => 'nullable|array',
             'assignees.*' => 'exists:users,id',
+            'created_by' => 'nullable|exists:users,id',
 
         ]);
 
@@ -129,6 +132,7 @@ class TaskController extends Controller
             'assigned_to' => $validated['assignTo'],
             'due_date' => Carbon::parse($validated['dueDate'])->format('Y-m-d H:i:s'),
             'assignTo' => 'nullable|exists:users,id',
+            'created_by' => $request->user()->id,
         ]);
 
         return redirect()->back()->with('success', 'Task created successfully.');
@@ -136,7 +140,7 @@ class TaskController extends Controller
 
     public function updateTask(Request $request, $id)
     {
-        dd($request->all());
+        // dd($request->all());
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             // 'category' => 'required|string',

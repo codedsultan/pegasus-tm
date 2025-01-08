@@ -75,6 +75,11 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword 
         return $this->belongsToMany(Task::class, 'task_user');
     }
 
+
+    public function ownedTasks()
+    {
+        return $this->hasMany(Task::class, 'created_by'); // Define inverse relationship
+    }
     // public function registerMediaConversions(?Media $media = null): void
     // {
     //     // Convert image to a thumbnail
