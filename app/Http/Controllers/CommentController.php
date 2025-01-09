@@ -32,7 +32,7 @@ class CommentController extends Controller
     // Store a new comment
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $validated = $request->validateWithBag('comment',[
             'content' => 'required|string',
             'task_id' => 'required|integer',
             'parent_id' => 'nullable|integer',
