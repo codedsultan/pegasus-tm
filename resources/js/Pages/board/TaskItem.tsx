@@ -11,7 +11,7 @@ interface TaskItemProps {
 const TaskItem = ({ task, toggleDescriptionModal }: TaskItemProps) => {
 	return (
 		<>
-			<div className="p-6">
+			<div className="p-3">
 				<div className="flex justify-between items-center">
 					<small>{task.dueDate}</small>
 					<span
@@ -22,27 +22,43 @@ const TaskItem = ({ task, toggleDescriptionModal }: TaskItemProps) => {
 					</span>
 				</div>
 				<h5 onClick={toggleDescriptionModal} className="my-2">
-					<span className="text-base text-gray-700 dark:text-slate-400 font-medium">{task.title}</span>
+					<span className="text-sm text-gray-700 dark:text-slate-400 font-medium">{task.title}</span>
 				</h5>
-				<p className="space-x-3">
-					<span className="text-nowrap mb-2">
+				{/* <p className="space-x-3"> */}
+                <div className="flex items-center justify-between">
+					{/* <span className="text-nowrap mb-2">
 						<i className="ri-briefcase-2-line text-gray-500 dark:text-gray-400"></i> {task.category}
 					</span>
-					&nbsp;
-					<span className="text-nowrap mb-2">
+					&nbsp; */}
+					{/* <span className="text-nowrap mb-2">
 						<i className="ri-discuss-line text-gray-500 dark:text-gray-400"></i>
-						<b className="text-gray-500 dark:text-gray-400">&nbsp;{task.comment_count}</b> Comments
+						<b className="text-gray-500 dark:text-gray-400">&nbsp;{task.comment_count}</b>
+					</span> */}
+                    {/* <div className="mt-1"> */}
+                    {/* <span className="text-nowrap mb-2"> */}
+                        <div className="flex items-center">
+                            {(task.assignees || []).map((avatar : any, idx: number) => (
+                                <Tippy content={avatar.first_name} key={idx}>
+                                    <div className="-me-3">{true? <img src={avatar.avatar_img || avatar.avatar} alt={avatar.first_name} className="rounded-full h-7 w-7 hover:-translate-y-0.5 transition-all duration-200" /> : <div className={`${avatar.textBg} font-medium flex items-center justify-center rounded-full h-8 w-8 hover:-translate-y-0.5 transition-all duration-200`}>{avatar.image}</div>}</div>
+                                </Tippy>
+                            ))}
+                        </div>
+                    <span className="text-nowrap mb-2">
+						<i className="ri-discuss-line text-gray-500 dark:text-gray-400"></i>
+						<b className="text-gray-500 dark:text-gray-400">&nbsp;{task.comment_count}</b>
 					</span>
-				</p>
-				<div className="mt-5">
-					<div className="flex items-center">
-						{(task.assignees || []).map((avatar : any, idx: number) => (
-							<Tippy content={avatar.title} key={idx}>
-								<div className="-me-3">{true? <img src={avatar.avatar_img || avatar.avatar} alt={avatar.first_name} className="rounded-full h-8 w-8 hover:-translate-y-0.5 transition-all duration-200" /> : <div className={`${avatar.textBg} font-medium flex items-center justify-center rounded-full h-8 w-8 hover:-translate-y-0.5 transition-all duration-200`}>{avatar.image}</div>}</div>
-							</Tippy>
-						))}
-					</div>
-				</div>
+                    {/* </span> */}
+				    {/* </div> */}
+				{/* </p> */}
+                </div>
+
+                {/* <div className="flex items-center px-3">
+                            {(task.assignees || []).map((avatar : any, idx: number) => (
+                                <Tippy content={avatar.first_name} key={idx}>
+                                    <div className="-me-3">{true? <img src={avatar.avatar_img || avatar.avatar} alt={avatar.first_name} className="rounded-full h-8 w-8 hover:-translate-y-0.5 transition-all duration-200" /> : <div className={`${avatar.textBg} font-medium flex items-center justify-center rounded-full h-8 w-8 hover:-translate-y-0.5 transition-all duration-200`}>{avatar.image}</div>}</div>
+                                </Tippy>
+                            ))}
+                        </div> */}
 			</div>
 		</>
 	)
