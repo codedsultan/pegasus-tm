@@ -166,6 +166,7 @@ const KanbanApp = () => {
 		setData('status', newTaskDetails.status);
 		post('/tasks', {
 			onSuccess: () => {
+
 				// Add the new task to the correct state queue
 				// const newTask = {
 				// 	...data,
@@ -178,7 +179,8 @@ const KanbanApp = () => {
 
 				// Close the modal and reset the form
 				// reset();
-				// setNewTaskModal(false);
+				setNewTaskModal(false);
+                refreshTaskList();
 				// setTotalTasks(totalTasks + 1);
 			},
 		});
@@ -981,7 +983,7 @@ const KanbanApp = () => {
                 </div>
 
                 {/* Add New Task Modal */}
-                <ModalLayout showModal={newTaskModal} toggleModal={() => toggleNewTaskModal()} panelClassName="min-w-[768px] mt-8 rounded-none" aria-hidden="true">
+                <ModalLayout showModal={newTaskModal} toggleModal={() => toggleNewTaskModal()} panelClassName="mt-8 rounded-none min-w-[768px]" aria-hidden="true">
                     <div className="duration-300 ease-in-out transition-all sm:max-w-3xl sm:w-full sm:mx-auto flex flex-col bg-white shadow-sm rounded dark:bg-gray-800">
                         <div className="flex justify-between items-center py-3 px-6 border-b dark:border-gray-700">
                             <h3 className="font-medium text-gray-600 dark:text-white text-base">Create New Task</h3>
@@ -1004,30 +1006,30 @@ const KanbanApp = () => {
                                 required
                                 errors={errors.username}
                             > */}
-                                <FormInput name="category" label="Project" type="select" containerClass="w-full space-y-1.5 mb-6" className="form-select" key="category"  value={data.category} errors={errors} onChange={(e) => setData('category', e.target.value)}>
+                                {/* <FormInput name="category" label="Project" type="select" containerClass="w-full space-y-1.5 mb-6" className="form-select" key="category"  value={data.category} errors={errors} onChange={(e) => setData('category', e.target.value)}>
                                     <option>Attex</option>
                                     <option>CRM</option>
                                     <option>Design</option>
                                     <option>iOS</option>
-                                </FormInput>
+                                </FormInput> */}
 
                                 <div className="grid sm:grid-cols-12 gap-6">
-                                    <div className="lg:col-span-8 sm:col-span-6">
-                                        <FormInput name="title" label="Title" placeholder="Enter Title" type="text" containerClass="space-y-1.5 mb-6" className="form-input" key="title"  value={data.title} errors={errors} onChange={(e) => setData('title', e.target.value)} />
+                                    <div className="lg:col-span-12 sm:col-span-12">
+                                        <FormInput name="title" label="" placeholder="Enter Title" type="text" containerClass="space-y-1.5 mb-6" className="form-input" key="title"  value={data.title} errors={errors} onChange={(e) => setData('title', e.target.value)} />
                                     </div>
-                                    <div className="lg:col-span-4 sm:col-span-6">
+                                    {/* <div className="lg:col-span-4 sm:col-span-6">
                                         <FormInput name="priority" label="Priority" type="select" containerClass="space-y-1.5 mb-6" className="form-select" key="priority" value={data.priority} errors={errors} onChange={(e) => setData('priority', e.target.value)}>
                                             <option>Low</option>
                                             <option>Medium</option>
                                             <option>High</option>
                                         </FormInput>
-                                    </div>
+                                    </div> */}
                                 </div>
 
-                                <FormInput name="description" label="Description" type="textarea" containerClass="w-full space-y-1.5 mb-6" className="form-input" rows={3} key="description" value={data.description} errors={errors} onChange={(e) => setData('description', e.target.value)} />
+                                {/* <FormInput name="description" label="Description" type="textarea" containerClass="w-full space-y-1.5 mb-6" className="form-input" rows={3} key="description" value={data.description} errors={errors} onChange={(e) => setData('description', e.target.value)} /> */}
 
                                 <div className="grid sm:grid-cols-2 gap-6">
-                                    <div className="col-md-6">
+                                    {/* <div className="col-md-6">
                                         <FormInput name="assignTo" label="Assign To" type="select" containerClass="space-y-1.5 mb-6" labelClassName="font-semibold text-gray-500" className="form-select" key="assignTo" value={data.assignTo} errors={errors} onChange={(e) => setData('assignTo', e.target.value)}>
                                             {(assignees || []).map((assignee, idx) => (
                                                 <option key={idx} value={assignee.id}>
@@ -1035,8 +1037,8 @@ const KanbanApp = () => {
                                                 </option>
                                             ))}
                                         </FormInput>
-                                    </div>
-                                    <div className="col-md-6">
+                                    </div> */}
+                                    {/* <div className="col-md-6">
                                         <div className="space-y-1.5 mb-6 flex flex-col">
                                             <label htmlFor="task-priority" className="font-semibold text-gray-500">
                                                 Due Date
@@ -1051,18 +1053,18 @@ const KanbanApp = () => {
                                                 }}
                                             />
                                         </div>
-                                    </div>
+                                    </div> */}
                                 </div>
                                 <div className="flex justify-end items-center gap-2">
-                                    <button className="btn bg-light text-gray-800 transition-all dark:bg-gray-700 dark:text-gray-100" type="button" onClick={toggleNewTaskModal}>
+                                    {/* <button className="btn bg-light text-gray-800 transition-all dark:bg-gray-700 dark:text-gray-100" type="button" onClick={toggleNewTaskModal}>
                                         Close
-                                    </button>
+                                    </button> */}
                                     <button
                                         type="submit"
                                         disabled={processing}
                                         className="btn btn-primary w-full"
                                     >
-						                {processing ? 'Submitting...' : 'Submit'}
+						                {processing ? 'Creating...' : 'Create'}
                                     </button>
                                 </div>
                             </form>
