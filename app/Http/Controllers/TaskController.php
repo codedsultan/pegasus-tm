@@ -111,10 +111,10 @@ class TaskController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
-            'category' => 'required|string',
-            'status' => 'required|string',
-            'priority' => 'required|string',
-            'description' => 'required|string',
+            'category' => 'nullable|string',
+            'status' => 'nullable|string',
+            'priority' => 'nullable|string',
+            'description' => 'nullable|string',
             'dueDate' => 'nullable|date',
             'assignTo' => 'nullable|exists:users,id',
             'assignees' => 'nullable|array',
@@ -122,19 +122,20 @@ class TaskController extends Controller
             'created_by' => 'nullable|exists:users,id',
 
         ]);
-
-        Task::create([
+        // dd($validated);
+        $task = Task::create([
             'title' => $validated['title'],
             'category' => $validated['category'],
-            'status' => $validated['status'],
-            'priority' => $validated['priority'],
+            'status' => $validated['status'] ?? 'Todo',
+            'priority' => $validated['priority']?? 'Medium',
             'description' => $validated['description'],
             'assigned_to' => $validated['assignTo'],
-            'due_date' => Carbon::parse($validated['dueDate'])->format('Y-m-d H:i:s'),
-            'assignTo' => 'nullable|exists:users,id',
+            'due_date' => $validated['dueDate'] && Carbon::parse($validated['dueDate'])->format('Y-m-d H:i:s'),
+            'assignTo' => $validated['assignTo'],
             'created_by' => $request->user()->id,
         ]);
 
+        // dd($task);
         return redirect()->back()->with('success', 'Task created successfully.');
     }
 
