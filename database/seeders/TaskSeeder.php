@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\Board;
 use App\Models\Task;
+use App\Models\User;
+use App\Models\Workspace;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -16,7 +18,7 @@ class TaskSeeder extends Seeder
     {
         $tasks = [
             [
-                'id' => 1,
+                // 'id' => 1,
                 'title' => 'iOS App home page',
                 'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.',
                 'status' => 'Todo',
@@ -54,7 +56,7 @@ class TaskSeeder extends Seeder
                 ],
             ],
             [
-                'id' => 2,
+                // 'id' => 2,
                 'title' => 'Topnav layout design',
                 'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.',
                 'status' => 'Todo',
@@ -78,7 +80,7 @@ class TaskSeeder extends Seeder
                 ],
             ],
             [
-                'id' => 3,
+                // 'id' => 3,
                 'title' => 'Invite user to a project',
                 'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.',
                 'status' => 'Todo',
@@ -109,7 +111,7 @@ class TaskSeeder extends Seeder
                 ],
             ],
             [
-                'id' => 4,
+                // 'id' => 4,
                 'title' => 'Write a release note',
                 'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.',
                 'status' => 'Inprogress',
@@ -133,7 +135,7 @@ class TaskSeeder extends Seeder
                 ],
             ],
             [
-                'id' => 5,
+                // 'id' => 5,
                 'title' => 'Enable analytics tracking',
                 'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.',
                 'status' => 'Inprogress',
@@ -164,7 +166,7 @@ class TaskSeeder extends Seeder
                 ],
             ],
             [
-                'id' => 6,
+                // 'id' => 6,
                 'title' => 'Kanban board design',
                 'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.',
                 'status' => 'Review',
@@ -195,7 +197,7 @@ class TaskSeeder extends Seeder
                 ],
             ],
             [
-                'id' => 7,
+                // 'id' => 7,
                 'title' => 'Code HTML email template',
                 'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.',
                 'status' => 'Review',
@@ -225,7 +227,7 @@ class TaskSeeder extends Seeder
                 ],
             ],
             [
-                'id' => 8,
+                // 'id' => 8,
                 'title' => 'Brand logo design',
                 'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.',
                 'status' => 'Review',
@@ -257,7 +259,7 @@ class TaskSeeder extends Seeder
                 ],
             ],
             [
-                'id' => 9,
+                // 'id' => 9,
                 'title' => 'Improve animation loader',
                 'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.',
                 'status' => 'Review',
@@ -281,7 +283,7 @@ class TaskSeeder extends Seeder
                 ],
             ],
             [
-                'id' => 10,
+                // 'id' => 10,
                 'title' => 'Dashboard design',
                 'description' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi.',
                 'status' => 'Done',
@@ -325,20 +327,58 @@ class TaskSeeder extends Seeder
             ->create();
         }
 
-        Board::factory()
-            ->count(5)
-            ->create()
-            ->each(function ($project) use ($tasks) {
+        $user = User::where('email', 'codesultan369@gmail.com')->first();
+        $user2 = User::where('email', 'test@example.com')->first();
+        Workspace::factory([
+            'owner_id' => $user->id,
+        ])
+            ->count(3)->create()->each(function ($workspace) use ($user,$user2, $tasks) {
+                // $workspace->owner()->associate($user);
+                // associate($user)
+                // $workspace->users()->attach($user);
+                // $workspace->users()->save();
+                $workspace->users()->sync([$user, $user2]);
+                // $workspace->save();
+                Board::factory(['workspace_id' => $workspace->id, 'created_by' => $user->id])
+                ->count(5)
+                ->create()
+                ->each(function ($project) use ($tasks, $user) {
                 // Task::factory()->count(10)->create(['project_id' => $project->id]);
                 // Task::factory($task)->create(['project_id' => $project->id]);
-                foreach ($tasks as $task) {
-                    $task = array_merge($task, ['board_id' => $project->id]);
-                    unset($task['id']);
-                    Task::factory($task)
-                    // ->withFileUpload(fake())
-                    ->create();
-                }
+                    foreach ($tasks as $task) {
+                        $task = array_merge($task, ['board_id' => $project->id, 'created_by' => $user->id]);
+                        unset($task['id']);
+                        Task::factory($task)
+                        // ->withFileUpload(fake())
+                        ->create();
+                    }
+                });
             });
+            // ->for($user, 'owner') // Assuming a relationship 'owner' in Workspace
+            // ->has(
+            //     Board::factory()
+            //         ->count(2)
+            //         ->has(
+            //             Task::factory()->count(5),
+            //             'tasks'
+            //         ),
+            //     'boards'
+            // )
+            // ->create();
+        // Board::factory()
+        //     ->count(5)
+        //     ->create()
+        //     ->each(function ($project) use ($tasks) {
+        //         // Task::factory()->count(10)->create(['project_id' => $project->id]);
+        //         // Task::factory($task)->create(['project_id' => $project->id]);
+        //         foreach ($tasks as $task) {
+        //             $task = array_merge($task, ['board_id' => $project->id]);
+        //             unset($task['id']);
+        //             Task::factory($task)
+        //             // ->withFileUpload(fake())
+        //             ->create();
+        //         }
+        //     });
         // Task::factory(20)->create();
     }
 }

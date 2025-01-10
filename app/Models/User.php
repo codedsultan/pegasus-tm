@@ -94,4 +94,11 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword 
         return Attribute::get(fn () => $this->getFirstMedia('avatars')?->getUrl());
     }
 
+
+    public function workspaces()
+    {
+        return $this->belongsToMany(Workspace::class, 'user_workspace');
+    }
+
+
 }

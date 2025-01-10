@@ -27,34 +27,41 @@ const MENU_ITEMS: MenuItemTypes[] = [
 		icon: 'ri-home-4-line'
     },
     {
-        key: 'bashboard',
+        key: 'boards',
         label: 'Boards',
         url: '/boards',
         isTitle: false,
 		icon: 'ri-pages-line',
     },
-
-	{
-		key: 'pages',
-		label: 'Pages',
-		isTitle: false,
+    {
+        key: 'workspaces',
+        label: 'Workspaces',
+        url: '/workspaces',
+        isTitle: false,
 		icon: 'ri-pages-line',
-		children: [
-			{
-				key: 'pages-starter',
-				label: 'Starter Page',
-				url: '/starter',
-				parentKey: 'pages',
-			},
-			// {
-			// 	key: 'pages-profile',
-			// 	label: 'Profile',
-			// 	url: '/profile',
-			// 	parentKey: 'pages',
-			// },
+    },
 
-		],
-	},
+	// {
+	// 	key: 'pages',
+	// 	label: 'Pages',
+	// 	isTitle: false,
+	// 	icon: 'ri-pages-line',
+	// 	children: [
+	// 		{
+	// 			key: 'pages-starter',
+	// 			label: 'Starter Page',
+	// 			url: '/starter',
+	// 			parentKey: 'pages',
+	// 		},
+	// 		{
+	// 			key: 'pages-profile',
+	// 			label: 'Profile',
+	// 			url: '/profile',
+	// 			parentKey: 'pages',
+	// 		},
+
+	// 	],
+	// },
 
 ]
 

@@ -607,10 +607,54 @@ const KanbanApp = () => {
         attachments: [],
     });
 
+    const [commentReplyForm, setCommentReplyForm] = useState<CommentFormState>({
+        content: '',
+        errors: {},
+        // taskId: task?.id,
+        parentId: undefined,
+        isReply: false,
+        repliedTo: undefined,
+        quotedUser: '',
+        attachments: [],
+    });
+
+
+    const [commentChildReplyForm, setCommentChildReplyForm] = useState<CommentFormState>({
+        content: '',
+        errors: {},
+        // taskId: task?.id,
+        parentId: undefined,
+        isReply: false,
+        repliedTo: undefined,
+        quotedUser: '',
+        attachments: [],
+    });
+
+    const [commentReplyingTo, setCommentReplyingTo] = useState(null);
+
     const [selectedCommentFiles, setSelectedCommentFiles] = useState<FileWithPreview[]>([]);
     const [replyingTo, setReplyingTo] = useState(null);
 
     const [childreplyingTo, setChildReplyingTo] = useState(null);
+
+
+
+    const handleReplyingTo = (commentId: number, repliedTo: number) => {
+        // e.preventDefault();
+
+        console.log('in handleReplyingTo ::' + 'commentId:' + commentId + ' repliedTo:' + repliedTo );
+
+        setCommentReplyingTo(commentId as any);
+
+        setCommentReplyForm({
+            ...commentReplyForm,
+            repliedTo: repliedTo,
+            // quotedUser: quotedUser,
+            parentId: commentId,
+        });
+
+        handleSendComment('reply', commentId, repliedTo);
+    }
 
     const handleChildReplyingTo = (commentId: number, repliedTo: number, quotedUser: string) => {
         // e.preventDefault();
@@ -619,15 +663,18 @@ const KanbanApp = () => {
 
         setChildReplyingTo(commentId as any);
 
-        setCommentForm({
+        setCommentChildReplyForm({
             ...commentForm,
             repliedTo: repliedTo,
             quotedUser: quotedUser,
             parentId: commentId,
         });
 
-        handleSendComment(commentId, repliedTo, quotedUser);
+        handleSendComment('childReply', commentId, repliedTo, quotedUser);
     };
+
+
+    //
     // useEffect(() => {
     //     // setCommentForm((prev) => ({
     //     //     ...prev,
@@ -690,22 +737,26 @@ const KanbanApp = () => {
         });
     };
 
-
-
-    const handleSendComment = ( parentId?: number ,repliedTo?: number ,quotedUser?: string ) => {
-        // e.preventDefault();
-
+    const handleSendComment = ( type?: any ,parentId?: number ,repliedTo?: number ,quotedUser?: string) => {
+        console.log('in handleSendComment ::' + 'type:' + type );
         const formData = new FormData();
-        formData.append('content', commentForm.content);
+
+        if (type === 'comment') {
+            formData.append('content', commentForm.content);
+        }
+        if (type === 'reply') {
+            formData.append('content', commentReplyForm.content);
+        }
+        if (type === 'childReply') {
+            formData.append('content', commentChildReplyForm.content);
+        }
+        // formData.append('content', commentForm.content);
         if (task?.id) {
             formData.append('task_id', task?.id.toString());
-            // formData.append('task_id', commentForm.taskId.toString());
         }
 
         if (repliedTo) {
             formData.append('replied_to', repliedTo?.toString());
-            // formData.append('replied_to', commentForm.repliedTo.toString());
-            // formData.append('is_reply', commentForm.isReply.toString());
         }
 
         if (quotedUser) {
@@ -715,74 +766,102 @@ const KanbanApp = () => {
         if (parentId) {
             formData.append('parent_id', parentId.toString());
         }
-        // if (commentForm.parentId) {
-        //     formData.append('parent_id', commentForm.parentId.toString());
-        // }
-        // if (!commentForm.repliedTo)) {
-
-        // }
         selectedCommentFiles.forEach((file, index) => {
             formData.append(`attachments[${index}]`, file);
         });
 
 
-
-        // setDescriptionModal(true);
         router.post(route('comments.store'), formData, {
-            // errorBag: 'createComment',
-            // dd();
           headers: {
             'Content-Type': 'multipart/form-data',
-          },
-        //   preserveScroll: true,
-          preserveState: true,
-        //   onError: (error) => {
-        //     console.error('Error submitting comment:', error);
-        //     setCommentForm((prev) => ({
-        //         ...prev,
-        //         errors: errors,
-        //       }));
-        //   },
+        },
 
-          onFinish: () => {
-            // setDescriptionModal(true);
-             console.log('Comment submitted successfully!');
-            // setCommentForm({
-            //     content: '',
-            //     errors: {},
-            //     attachments: [],
-            // });
-            //   setSelectedCommentFiles([]);
-            //   setReplyingTo(null);
-            // console.log('Comment submitted successfully!');
+
+        preserveState: true,
+          onFinish: ()  => {
+            console.log('Comment submitted successfully!');
+            if(type === 'comment'){
+                setCommentForm({
+                    content: '',
+                    parentId: undefined,
+                    isReply: false,
+                    repliedTo: undefined,
+                    quotedUser: '',
+                    errors: {},
+                    attachments: [],
+                });
+            }
+            if(type === 'reply'){
+                setCommentReplyForm({
+                    content: '',
+                    errors: {},
+                    taskId: task?.id,
+                    parentId: undefined,
+                    isReply: false,
+                    repliedTo: undefined,
+                    quotedUser: '',
+                    attachments: [],
+                });
+            }
+            if(type === 'childReply'){
+                setCommentChildReplyForm({
+                    content: '',
+                    errors: {},
+                    taskId: task?.id,
+                    parentId: undefined,
+                    isReply: false,
+                    repliedTo: undefined,
+                    quotedUser: '',
+                    attachments: [],
+                });
+            }
           },
         });
+    };
 
-    //     try {
-    //       const response = await fetch('/api/comments', {
-    //         method: 'POST',
-    //         body: formData,
-    //       });
-
-    //       if (!response.ok) {
-    //         const errorData = await response.json();
-    //         setCommentForm((prev) => ({
-    //           ...prev,
-    //           errors: errorData.errors,
-    //         }));
-    //       } else {
-    //         // Clear the form on successful submission
-    //         setCommentForm({
-    //           content: '',
-    //           errors: {},
-    //           attachments: [],
-    //         });
-    //         setSelectedCommentFiles([]);
-    //       }
-    //     } catch (error) {
-    //       console.error('Error submitting comment:', error);
+    // const handleSendCommentReply = ( parentId?: number ,repliedTo?: number ,quotedUser?: string ) => {
+    //     const formData = new FormData();
+    //     formData.append('content', commentReplyForm.content);
+    //     if (task?.id) {
+    //         formData.append('task_id', task?.id.toString());
     //     }
-      };
+
+    //     if (repliedTo) {
+    //         formData.append('replied_to', repliedTo?.toString());
+    //     }
+
+    //     if (quotedUser) {
+    //         formData.append('quoted_user', quotedUser);
+    //     }
+
+    //     if (parentId) {
+    //         formData.append('parent_id', parentId.toString());
+    //     }
+    //     selectedCommentFiles.forEach((file, index) => {
+    //         formData.append(`attachments[${index}]`, file);
+    //     });
+
+    //     router.post(route('comments.store'), formData, {
+    //       headers: {
+    //         'Content-Type': 'multipart/form-data',
+    //       },
+    //     preserveState: true,
+    //       onFinish: () => {
+    //         // setDescriptionModal(true);
+    //          console.log('Comment submitted successfully!');
+    //         setCommentForm({
+    //             content: '',
+    //             parentId: undefined,
+    //             isReply: false,
+    //             repliedTo: undefined,
+    //             quotedUser: '',
+    //             errors: {},
+    //             attachments: [],
+    //         });
+
+    //       },
+    //     });
+    // };
       const renderComments = (comments:any) => {
         return  comments.map((comment:any, idx:number) => (
                 <div key={idx} className="flex gap-5 border rounded-md border-gray-300 dark:border-gray-700 p-3 mb-2">
@@ -796,58 +875,6 @@ const KanbanApp = () => {
                         >
                             Reply
                         </button>
-                        {comment.replies?.length > 0 ? (
-                            comment.replies.map((reply:any, idx:number) => (
-                            <div key={idx} className="flex gap-5 border rounded-md border-gray-300 dark:border-gray-700 p-3 mb-2">
-                                <img src={reply.user?.avatar_img || reply.user?.avatar} alt="" className="h-12 rounded-full" />
-                                <div className="w-full">
-                                    <h5 className=" text-gray-500 dark:text-gray-400 font-semibold">{reply.user?.fullname}</h5>
-                                    <p className="font-light mb-2">{ reply.quoted_user ? ('@ '+ reply.quoted_user + ' : ' + reply.content ): reply.content}</p>
-                                </div>
-                                {/* ChildReply Form */}
-                                {childreplyingTo === reply.id && (
-                                    // <form
-                                    //     className="mt-2 ml-6"
-                                    // >
-                                    <>
-                                        <textarea
-                                            className="form-input w-full p-2 border rounded"
-                                            placeholder="Write your reply..."
-                                            rows={2}
-                                            value={commentForm.content}
-                                            onChange={(e) =>
-                                                setCommentForm({
-                                                    ...commentForm,
-                                                    content: e.target.value,
-                                                })
-                                            }
-                                        ></textarea>
-                                        <div className="flex justify-end mt-2">
-                                            <button
-                                                type="button"
-                                                onClick={() =>  handleChildReplyingTo(comment.id, reply.id, reply.user?.fullname)}
-                                                className="btn btn-sm bg-primary text-white"
-                                            >
-                                                Submit Reply
-                                            </button>
-                                        </div>
-                                    </>
-                                    // </form>
-                                )}
-                                <button
-                                    onClick={() => setChildReplyingTo(reply.id)}
-                                    className="text-sm text-blue-500"
-                                >
-                                    Reply
-                                </button>
-                            </div>
-                            ))
-                        ) : (
-                            <p className="font-light text-gray-500 dark:text-gray-400">
-                                No replies for this comment.
-                            </p>
-                        )}
-
                         {/* Reply Form */}
                         {replyingTo === comment.id && (
                             // <form
@@ -858,10 +885,10 @@ const KanbanApp = () => {
                                     className="form-input w-full p-2 border rounded"
                                     placeholder="Write your reply..."
                                     rows={2}
-                                    value={commentForm.content}
+                                    value={commentReplyForm.content}
                                     onChange={(e) =>
-                                        setCommentForm({
-                                            ...commentForm,
+                                        setCommentReplyForm({
+                                            ...commentReplyForm,
                                             content: e.target.value,
                                         })
                                     }
@@ -869,7 +896,7 @@ const KanbanApp = () => {
                                 <div className="flex justify-end mt-2">
                                     <button
                                         type="button"
-                                        onClick={() => handleSendComment( comment.parent_id || comment.id, comment.id)}
+                                        onClick={() => handleReplyingTo( comment.parent_id || comment.id, comment.id)}
                                         className="btn btn-sm bg-primary text-white"
                                     >
                                         Submit Reply
@@ -878,6 +905,64 @@ const KanbanApp = () => {
                             </>
                             // </form>
                         )}
+                        {comment.replies?.length > 0 ? (
+                            comment.replies.map((reply:any, idx:number) => (
+                            <div key={idx}>
+                                <div className="flex gap-5 border rounded-md border-gray-300 dark:border-gray-700 p-3 mb-2">
+                                    <img src={reply.user?.avatar_img || reply.user?.avatar} alt="" className="h-12 rounded-full" />
+                                    <div className="w-full">
+                                        <h5 className=" text-gray-500 dark:text-gray-400 font-semibold">{reply.user?.fullname}</h5>
+                                        <p className="font-light mb-2">{ reply.quoted_user ? ('@ '+ reply.quoted_user + ' : ' + reply.content ): reply.content}</p>
+                                    </div>
+
+                                    <button
+                                        onClick={() => setChildReplyingTo(reply.id)}
+                                        className="text-sm text-blue-500"
+                                    >
+                                        Reply
+                                    </button>
+                                </div>
+                                <div>
+                                    {/* ChildReply Form */}
+                                    {childreplyingTo === reply.id && (
+                                        // <form
+                                        //     className="mt-2 ml-6"
+                                        // >
+                                        <div className="mb-2 ml-6">
+                                            <textarea
+                                                className="form-input w-full p-2 border rounded"
+                                                placeholder="Write your reply..."
+                                                rows={2}
+                                                value={commentChildReplyForm.content}
+                                                onChange={(e) =>
+                                                    setCommentChildReplyForm({
+                                                        ...commentChildReplyForm,
+                                                        content: e.target.value,
+                                                    })
+                                                }
+                                            ></textarea>
+                                            <div className="flex justify-end mt-2">
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>  handleChildReplyingTo(comment.id, reply.id, reply.user?.fullname)}
+                                                    className="btn btn-sm bg-primary text-white"
+                                                >
+                                                    Reply
+                                                </button>
+                                            </div>
+                                        </div>
+                                        // </form>
+                                    )}
+                                </div>
+                            </div>
+                            ))
+                        ) : (
+                            <p className="font-light text-gray-500 dark:text-gray-400">
+                                No replies for this comment.
+                            </p>
+                        )}
+
+
                     </div>
                 </div>
             )
@@ -1240,7 +1325,7 @@ const KanbanApp = () => {
                                                         <label htmlFor="fileInput" className="btn btn-link text-xl cursor-pointer">
                                                             <i className="ri-attachment-2"></i>
                                                         </label>
-                                                        <button type="button" onClick={() => handleSendComment()}  className="btn bg-primary text-white btn-sm">
+                                                        <button type="button" onClick={() => handleSendComment('comment')}  className="btn bg-primary text-white btn-sm">
                                                             Submit
                                                         </button>
                                                     </div>
