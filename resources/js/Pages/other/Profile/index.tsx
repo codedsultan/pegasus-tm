@@ -52,19 +52,19 @@ const ProfilePages = () => {
                                 <p className="text-zinc-400 mb-3">
                                     <strong>Full Name :</strong> <span className="ms-2">{auth?.user.first_name + ' ' + auth?.user.last_name}</span>
                                 </p>
-                                <p className="text-zinc-400 mb-3">
+                                {/* <p className="text-zinc-400 mb-3">
                                     <strong>Mobile :</strong>
                                     <span className="ms-2">(123) 123 1234</span>
-                                </p>
+                                </p> */}
                                 <p className="text-zinc-400 mb-3">
                                     <strong>Email :</strong> <span className="ms-2 ">{auth?.user.email}</span>
                                 </p>
-                                <p className="text-zinc-400 mb-1.5">
+                                {/* <p className="text-zinc-400 mb-1.5">
                                     <strong>Location :</strong> <span className="ms-2">USA</span>
-                                </p>
+                                </p> */}
                             </div>
 
-                            <ul className="social-list list-inline mt-6 ">
+                            {/* <ul className="social-list list-inline mt-6 ">
                                 <li className="me-2 inline-block">
                                     <Link href="" className="h-8 w-8 leading-7 block border-2 rounded-full border-primary text-primary">
                                         <i className="ri-facebook-circle-fill"></i>
@@ -85,7 +85,7 @@ const ProfilePages = () => {
                                         <i className="ri-github-fill"></i>
                                     </Link>
                                 </li>
-                            </ul>
+                            </ul> */}
                         </div>
                     </div>
 
@@ -133,7 +133,7 @@ const ProfilePages = () => {
                                             </div>
 
                                             <div className="grid md:grid-cols-2 grid-cols-1 gap-x-2.5">
-                                                <div className="">
+                                                {/* <div className="">
                                                     <div className="mb-6 space-y-2">
                                                         <label htmlFor="useremail" className="font-semibold text-sm text-gray-500">
                                                             Email Address
@@ -149,13 +149,14 @@ const ProfilePages = () => {
                                                             </small>
                                                         </span>
                                                     </div>
-                                                </div>
+                                                </div> */}
                                                 <div className="">
                                                     <div className="mb-6 space-y-2">
                                                         <label htmlFor="userpassword" className="font-semibold text-sm text-gray-500">
                                                             Password
                                                         </label>
-                                                        <input type="password" className="form-input" id="userpassword" placeholder="Enter password" />
+                                                         <br></br>
+                                                        {/* <input type="password" className="form-input" id="userpassword" placeholder="Enter password" /> */}
                                                         <span className="text-gray-500">
                                                             <small>
                                                                 If you want to change password please{' '}
@@ -169,7 +170,7 @@ const ProfilePages = () => {
                                                 </div>
                                             </div>
 
-                                            <h5 className="text-base mb-6 uppercase bg-light p-2 dark:bg-gray-700">
+                                            {/* <h5 className="text-base mb-6 uppercase bg-light p-2 dark:bg-gray-700">
                                                 <i className="ri-building-line me-1.5"></i> Company Info
                                             </h5>
                                             <div className="grid md:grid-cols-2 grid-cols-1 gap-x-2.5">
@@ -275,7 +276,7 @@ const ProfilePages = () => {
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                            </div> */}
 
                                             <div className="text-end">
                                                 <button type="submit" className="btn bg-success text-white mt-3">

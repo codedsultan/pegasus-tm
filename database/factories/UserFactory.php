@@ -2,7 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Models\Board;
+use App\Models\Task;
 use App\Models\User;
+use App\Models\Workspace;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -71,6 +74,21 @@ class UserFactory extends Factory
             }
             // Attach a predefined avatar to the user (use an existing file from storage)
             // Media collection name
+
+            // Workspace::factory()
+            // ->count(3)
+            // ->for($user, 'owner') // Assuming a relationship 'owner' in Workspace
+            // ->has(
+            //     Board::factory()
+            //         ->count(2)
+            //         ->has(
+            //             Task::factory()->count(5),
+            //             'tasks'
+            //         ),
+            //     'boards'
+            // )
+            // ->create();
+
         });
     }
 

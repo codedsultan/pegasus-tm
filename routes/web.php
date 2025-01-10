@@ -4,6 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\WorkspaceController;
+use App\Models\Workspace;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -95,9 +97,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/dashboard', function () {
         // dd(request()->user());
-        return Inertia::render('dashboard/Analytics/index', [
-            'message' => 'Hello from Laravel!',
-        ]);
+        $workspaces = Workspace::all();
+        return Inertia::render('dashboard/index', ['workspaces' => $workspaces]);
+        // return Inertia::render('dashboard/Analytics/index', [
+        //     'message' => 'Hello from Laravel!',
+        // ]);
     });
 });
 
@@ -172,4 +176,13 @@ Route::middleware('auth')->group(function () {
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
     Route::get('/comments/{comment}/replies', [CommentController::class, 'getReplies'])->name('comments.getReplies');
     Route::post('/comments/{comment}/replies', [CommentController::class, 'storeReply'])->name('comments.storeReply');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/workspaces', [WorkspaceController::class, 'index'])->name('workspaces.index');
+    Route::get('/workspaces/create', [WorkspaceController::class, 'create'])->name('workspaces.create');
+    Route::post('/workspaces', [WorkspaceController::class, 'store'])->name('workspaces.store');
+    Route::get('/workspaces/{workspace}', [WorkspaceController::class, 'show'])->name('workspaces.show');
+    Route::post('/workspaces/{workspace}/boards', [WorkspaceController::class, 'storeBoard'])->name('workspaces.storeBoard');
+    Route::get('/workspaces/{workspace}/boards/{board}', [WorkspaceController::class, 'showWorkspaceBoard'])->name('workspaces.showWorkspaceBoard');
 });
