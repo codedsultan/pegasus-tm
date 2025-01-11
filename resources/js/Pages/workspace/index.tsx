@@ -4,7 +4,7 @@ import { route } from 'vendor/tightenco/ziggy/src/js';
 import { FormInput, CustomDatepicker, PageBreadcrumb ,FileUploader} from '../../components'
 import VerticalLayout from '../../layouts/Vertical';
 import { ModalLayout } from '../../components/HeadlessUI'
-import React, { useState } from 'react';
+import { useState } from 'react';
 const WorkspaceDetails = () => {
   const workspace:any = usePage().props?.workspace;
   const props: any = {
