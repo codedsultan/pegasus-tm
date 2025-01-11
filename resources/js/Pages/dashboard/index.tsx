@@ -1,12 +1,10 @@
 import { Link, usePage } from "@inertiajs/react";
-import { route } from 'vendor/tightenco/ziggy/src/js';
 import VerticalLayout from '../../layouts/Vertical';
 import { ModalLayout } from '../../components/HeadlessUI'
-import { useForm ,router} from '@inertiajs/react';
+import { useForm} from '@inertiajs/react';
 // components
-import { FormInput, CustomDatepicker, PageBreadcrumb ,FileUploader} from '../../components'
+import { FormInput} from '../../components'
 import React, { useState } from 'react';
-import { set } from "react-hook-form";
 
 const WorkspaceList = () => {
 
