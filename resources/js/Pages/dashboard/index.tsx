@@ -1,43 +1,43 @@
-import { Link, usePage } from "@inertiajs/react";
-import VerticalLayout from '../../layouts/Vertical';
+// import { Link, usePage } from "@inertiajs/react";
+// import VerticalLayout from '../../layouts/Vertical';
 // import { ModalLayout } from '../../components/HeadlessUI'
-import { useForm} from '@inertiajs/react';
-// components
-import { FormInput} from '../../components'
-import { useState } from 'react';
+// import { useForm} from '@inertiajs/react';
+// import { FormInput} from '../../components'
+// import { useState } from 'react';
 
 const WorkspaceList = () => {
 
-    const [newWorkspaceModal, setNewWorkspaceModal] = useState<boolean>(false)
+    // const [newWorkspaceModal, setNewWorkspaceModal] = useState<boolean>(false)
 
-    const toggleNewWorkspaceModal = () => {
-        setNewWorkspaceModal((prevState) => !prevState)
-    }
+    // const toggleNewWorkspaceModal = () => {
+    //     setNewWorkspaceModal((prevState) => !prevState)
+    // }
 
-    const { data, setData, post, processing, reset, errors } = useForm({
-		name: '',
-	});
+    // const { data, setData, post, processing, reset, errors } = useForm({
+	// 	name: '',
+	// });
 
-    const workspaces:any = usePage().props?.workspaces;
-    const props: any = {
-        title: 'Starter Page',
-        description: 'Attex React is a free and open-source admin dashboard template built with React and Tailwind CSS. It is designed to be easily customizable and includes a wide range of features and components to help you build your own dashboard quickly and efficiently.',
-    }
-    // submit new workspace
-    const handleNewWorkSpace = (e: React.FormEvent) => {
-        e.preventDefault();
-        post('/workspaces', {
-			onSuccess: () => {
-				setNewWorkspaceModal(false);
-                setData('name', '');
-                // refreshWorkspaceList();
-			},
-		});
-    };
+    // const workspaces:any = usePage().props?.workspaces;
+    // const props: any = {
+    //     title: 'Starter Page',
+    //     description: 'Attex React is a free and open-source admin dashboard template built with React and Tailwind CSS. It is designed to be easily customizable and includes a wide range of features and components to help you build your own dashboard quickly and efficiently.',
+    // }
+    // // submit new workspace
+    // const handleNewWorkSpace = (e: React.FormEvent) => {
+    //     e.preventDefault();
+    //     post('/workspaces', {
+	// 		onSuccess: () => {
+	// 			setNewWorkspaceModal(false);
+    //             setData('name', '');
+    //             // refreshWorkspaceList();
+	// 		},
+	// 	});
+    // };
 
 	return (
 		<>
-            <VerticalLayout {...props}>
+            <h1>Your Workspaces</h1>
+            {/* <VerticalLayout {...props}>
                 <div>
                     <h1>Your Workspaces</h1>
                     <ul>
@@ -54,8 +54,7 @@ const WorkspaceList = () => {
                 </div>
 
 
-                {/* Add New Task Modal */}
-                {/* <ModalLayout showModal={newWorkspaceModal} toggleModal={() => toggleNewWorkspaceModal()} panelClassName="mt-8 rounded-none min-w-[768px]" aria-hidden="true">
+                <ModalLayout showModal={newWorkspaceModal} toggleModal={() => toggleNewWorkspaceModal()} panelClassName="mt-8 rounded-none min-w-[768px]" aria-hidden="true">
                     <div className="duration-300 ease-in-out transition-all sm:max-w-3xl sm:w-full sm:mx-auto flex flex-col bg-white shadow-sm rounded dark:bg-gray-800">
                         <div className="flex justify-between items-center py-3 px-6 border-b dark:border-gray-700">
                             <h3 className="font-medium text-gray-600 dark:text-white text-base">Create New Task</h3>
@@ -86,10 +85,10 @@ const WorkspaceList = () => {
                             </form>
                         </div>
                     </div>
-                </ModalLayout> */}
-            </VerticalLayout>
+                </ModalLayout>
+            </VerticalLayout> */}
         </>
-  );
-};
+   )
+}
 
 export default WorkspaceList;
