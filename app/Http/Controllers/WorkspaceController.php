@@ -19,7 +19,7 @@ class WorkspaceController extends Controller
     {
         $workspaces = $request->user()->workspaces()->with('boards.tasks')->get();
         $ownedWorkspaces = $request->user()->ownedWorkspaces()->with('boards.tasks')->get();
-        return Inertia::render('dashboard/index', ['workspaces' => $workspaces]);
+        return Inertia::render('workspace/WorkspaceList', ['workspaces' => $workspaces]);
         // return Inertia::render('Workspaces/Index', ['workspaces' => $workspaces]);
     }
 
