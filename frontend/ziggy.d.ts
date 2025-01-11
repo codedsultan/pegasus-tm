@@ -15,6 +15,7 @@ declare module 'ziggy-js' {
         }
     ],
     "verification.send": [],
+    "dashboard.index": [],
     "password.email": [],
     "password.reset": [
         {
@@ -24,60 +25,6 @@ declare module 'ziggy-js' {
     ],
     "password.update": [],
     "logout": [],
-    "boards.index": [],
-    "boards.task.update": [
-        {
-            "name": "id",
-            "required": true
-        }
-    ],
-    "boards.update-tasks": [],
-    "boards.task.delete": [
-        {
-            "name": "id",
-            "required": true
-        }
-    ],
-    "tasks.index": [],
-    "tasks.store": [],
-    "tasks.update": [
-        {
-            "name": "task",
-            "required": true
-        }
-    ],
-    "tasks.uploadFile": [
-        {
-            "name": "task",
-            "required": true
-        }
-    ],
-    "tasks.uploadFiles": [
-        {
-            "name": "task",
-            "required": true
-        }
-    ],
-    "tasks.deleteFile": [
-        {
-            "name": "mediaId",
-            "required": true
-        }
-    ],
-    "tasks.archive": [
-        {
-            "name": "task",
-            "required": true,
-            "binding": "id"
-        }
-    ],
-    "tasks.unarchive": [
-        {
-            "name": "task",
-            "required": true,
-            "binding": "id"
-        }
-    ],
     "comments.store": [],
     "comments.show": [
         {
@@ -155,20 +102,6 @@ declare module 'ziggy-js' {
             "binding": "id"
         }
     ],
-    "board.tasks.update": [
-        {
-            "name": "workspace",
-            "required": true
-        },
-        {
-            "name": "board",
-            "required": true
-        },
-        {
-            "name": "task",
-            "required": true
-        }
-    ],
     "board.tasks.uploadFile": [
         {
             "name": "workspace",
@@ -182,7 +115,8 @@ declare module 'ziggy-js' {
         },
         {
             "name": "task",
-            "required": true
+            "required": true,
+            "binding": "id"
         }
     ],
     "board.tasks.uploadFiles": [
@@ -198,7 +132,8 @@ declare module 'ziggy-js' {
         },
         {
             "name": "task",
-            "required": true
+            "required": true,
+            "binding": "id"
         }
     ],
     "board.tasks.deleteFile": [
@@ -251,7 +186,7 @@ declare module 'ziggy-js' {
             "binding": "id"
         }
     ],
-    "board.task.update": [
+    "board.tasks.update": [
         {
             "name": "workspace",
             "required": true,
@@ -263,7 +198,7 @@ declare module 'ziggy-js' {
             "binding": "id"
         },
         {
-            "name": "id",
+            "name": "task",
             "required": true
         }
     ],
