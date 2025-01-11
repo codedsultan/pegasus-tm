@@ -23,6 +23,7 @@ class BoardTaskController extends Controller
         $activeTasks = Task::active()->get();
         $archivedTasks = Task::archived()->get();
         $assignees = User::all();
+        // $
         // dd($tasks);
         return Inertia::render('board/index', [
             'title' => 'Task Board',

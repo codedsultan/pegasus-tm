@@ -44,4 +44,11 @@ class Comment extends Model
     //     return $this->morphTo();
     // }
 
+    // load top level comments
+
+    // public function getTopLevelCommentsAttribute()
+    // {
+    //     return $this->whereNull('parent_id')->get();
+    // }
+
 }

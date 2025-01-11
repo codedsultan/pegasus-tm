@@ -55,11 +55,18 @@ class Task extends Model implements HasMedia
         );
     }
 
-
+    // top level comments only
     public function comments()
     {
         return $this->hasMany(Comment::class, 'task_id');
     }
+
+
+
+    // public function comments()
+    // {
+    //     return $this->hasMany(Comment::class, 'task_id')->whereNull('parent_id');
+    // }
 
     public function getCommentCountAttribute()
     {

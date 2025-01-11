@@ -1246,9 +1246,9 @@ const KanbanApp = () => {
                                     <button type="button" onClick={() => toggleDescriptionModal(task)} className="btn btn-link text-xl">
                                         <i className="ri-delete-bin-line"></i>
                                     </button>
-                                    <button type="button" onClick={() => toggleDescriptionModal(task)} className="btn btn-link text-xl">
+                                    {/* <button type="button" onClick={() => toggleDescriptionModal(task)} className="btn btn-link text-xl">
                                         <i className="ri-archive-drawer-fill"></i>
-                                    </button>
+                                    </button> */}
 
                                 </div>
                                 <button
