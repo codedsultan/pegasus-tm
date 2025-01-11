@@ -100,5 +100,9 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword 
         return $this->belongsToMany(Workspace::class, 'user_workspace');
     }
 
+    public function ownedWorkspaces()
+    {
+        return $this->hasMany(Workspace::class, 'owner_id');
+    }
 
 }

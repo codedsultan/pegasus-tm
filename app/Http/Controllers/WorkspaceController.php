@@ -25,7 +25,7 @@ class WorkspaceController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate(['name' => 'required|string|max:255']);
-        $request->user()->workspaces()->create($data);
+        $request->user()->ownedWorkspaces()->create($data);
         return redirect()->back()->with('success', 'Workspace created successfully.');
     }
 
@@ -42,6 +42,7 @@ class WorkspaceController extends Controller
     public function storeBoard(Request $request, Workspace $workspace)
     {
         $data = $request->validate(['name' => 'required|string|max:255']);
+        $data['created_by'] = $request->user()->id;
         $workspace->boards()->create($data);
         return redirect()->back()->with('success', 'Board created successfully.');
     }
@@ -49,6 +50,7 @@ class WorkspaceController extends Controller
 
     public function showWorkspaceBoard(Request $request,Workspace $workspace, Board $board)
     {
+        // dd('here');
         $board->load('tasks');
 
         $tasks = Task::with('assignees')->get();
@@ -56,6 +58,9 @@ class WorkspaceController extends Controller
         $task = Task::find($id);
         $activeTasks = Task::active()->get();
         $archivedTasks = Task::archived()->get();
+
+        // $workspace = Workspace::find($board->workspace_id);
+        // $board = Board::find($board->id);
 
 
         // dd($task);
@@ -69,7 +74,7 @@ class WorkspaceController extends Controller
         $assignees = User::all();
         // dd($tasks);
 
-        return Inertia::render('board/index', [
+        return Inertia::render('workspace/board/index', [
             'board' => $board,
             'workspace' => $workspace,
             'title' => 'Board Task Board',

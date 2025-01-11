@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BoardTaskController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\TaskController;
@@ -141,6 +142,7 @@ Route::get('/phpinfo', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/boards',[TaskController::class, 'index'])->name('boards.index');
+
     Route::post('/boards/task/update/{id}', [TaskController::class, 'updateTask'])->name('boards.task.update');
     Route::post('/boards/update-tasks', [TaskController::class, 'updateTasks'])->name('boards.update-tasks');
     Route::delete('/boards/task/delete/{id}', [TaskController::class, 'destroy'])->name('boards.task.delete');
@@ -170,6 +172,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
+
+
 Route::middleware('auth')->group(function () {
     Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::get('/comments/{comment}', [CommentController::class, 'show'])->name('comments.show');
@@ -183,6 +187,25 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/workspaces/create', [WorkspaceController::class, 'create'])->name('workspaces.create');
     Route::post('/workspaces', [WorkspaceController::class, 'store'])->name('workspaces.store');
     Route::get('/workspaces/{workspace}', [WorkspaceController::class, 'show'])->name('workspaces.show');
-    Route::post('/workspaces/{workspace}/boards', [WorkspaceController::class, 'storeBoard'])->name('workspaces.storeBoard');
-    Route::get('/workspaces/{workspace}/boards/{board}', [WorkspaceController::class, 'showWorkspaceBoard'])->name('workspaces.showWorkspaceBoard');
+    Route::post('/workspaces/{workspace}/boards', [WorkspaceController::class, 'storeBoard'])->name('workspaces.board.create');
+    Route::get('/workspaces/{workspace}/boards/{board}', [WorkspaceController::class, 'showWorkspaceBoard'])->name('workspaces.board.show');
+    // Route::post('/workspaces/{workspace}/boards/{board}/create-task', [BoardTaskController::class, 'storeTask'])->name('boards.task.store');
+
 });
+
+Route::middleware(['auth', 'verified'])->prefix('workspaces/{workspace}/boards/{board}')->group(function () {
+
+    Route::get('/tasks', [BoardTaskController::class, 'index'])->name('board.tasks.index');
+    Route::post('/tasks', [BoardTaskController::class, 'store'])->name('boards.task.store');
+    Route::put('/tasks/{task}', [BoardTaskController::class, 'update'])->name('board.tasks.update');
+    Route::post('/tasks/{task}/upload-file', [BoardTaskController::class, 'uploadFile'])->name('board.tasks.uploadFile');
+    Route::post('/tasks/{task}/upload-files', [BoardTaskController::class, 'uploadFiles'])->name('board.tasks.uploadFiles');
+    Route::delete('/tasks/delete-file/{mediaId}', [BoardTaskController::class, 'deleteFile'])->name('board.tasks.deleteFile');
+    Route::patch('/tasks/{task}/archive', [BoardTaskController::class, 'archive'])->name('board.tasks.archive');
+    Route::patch('/tasks/{task}/unarchive', [BoardTaskController::class, 'unarchive'])->name('board.tasks.unarchive');
+    Route::post('/update-task/{id}', [BoardTaskController::class, 'updateTask'])->name('board.task.update');
+    Route::post('/update-tasks', [BoardTaskController::class, 'updateTasks'])->name('board.update-tasks');
+    Route::delete('/task-delete/{id}', [BoardTaskController::class, 'destroy'])->name('board.task.delete');
+    // Route::get('/tasks/{task}/edit', [TaskController::class, 'getTaskWithFiles'])->name('tasks.editWithFiles');
+});
+
