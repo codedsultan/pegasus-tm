@@ -5,7 +5,7 @@
 // import { FormInput} from '../../components'
 // import { useState } from 'react';
 
-const Dasboard = () => {
+const DashboardPages = () => {
 
     // const [newWorkspaceModal, setNewWorkspaceModal] = useState<boolean>(false)
 
@@ -91,4 +91,4 @@ const Dasboard = () => {
    )
 }
 
-export default Dasboard
+export default DashboardPages
