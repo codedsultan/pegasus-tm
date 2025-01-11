@@ -35,7 +35,7 @@ class Task extends Model implements HasMedia
     ];
     protected $dates = ['archived_at'];
 
-    protected $appends = ['assignee_ids','comment_count','is_archived'];
+    protected $appends = ['assignee_ids','comment_count','is_archived','due_date_iso'];
     public function user()
     {
         return $this->belongsTo(User::class, 'assignedTo');
@@ -104,4 +104,15 @@ class Task extends Model implements HasMedia
         return $this->belongsTo(Board::class)->withDefault();
     }
 
+    // Define relationship to User model for created_by
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by'); // Define inverse relationship
+    }
+
+    //  due date to readable iso format
+    public function getDueDateIsoAttribute()
+    {
+        return $this->due_date ? $this->due_date->format('Y-m-d') : null;
+    }
 }

@@ -4,9 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BoardTaskController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PasswordController;
-use App\Http\Controllers\TaskController;
 use App\Http\Controllers\WorkspaceController;
-use App\Models\Workspace;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -96,17 +94,10 @@ Route::post('/email/resend', function (Request $request) {
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    Route::get('/dashboard', function () {
-        // dd(request()->user());
-        $workspaces = Workspace::all();
-        return Inertia::render('dashboard/index', ['workspaces' => $workspaces]);
-        // return Inertia::render('dashboard/Analytics/index', [
-        //     'message' => 'Hello from Laravel!',
-        // ]);
-    });
+    Route::get('/dashboard', [WorkspaceController::class, 'index'])->name('dashboard.index');
+
 });
 
-// use App\Http\Controllers\PasswordController;
 
 Route::post('forgot-password', [PasswordController::class, 'sendResetLink'])
     ->name('password.email');
@@ -116,10 +107,6 @@ Route::get('reset-password/{token}', [PasswordController::class, 'showResetForm'
 
 Route::post('reset-password', [PasswordController::class, 'resetPassword'])
     ->name('password.update');
-// use Illuminate\Support\Facades\Password;
-
-// Route::post('/forgot-password', [PasswordController::class, 'sendResetLink'])->name('password.email');
-// Route::post('/reset-password', [PasswordController::class, 'reset'])->name('password.update');
 
 Route::post('/logout', [AuthController::class, 'destroy'])->name('logout');
 
@@ -140,40 +127,6 @@ Route::get('/phpinfo', function () {
     phpinfo();
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/boards',[TaskController::class, 'index'])->name('boards.index');
-
-    Route::post('/boards/task/update/{id}', [TaskController::class, 'updateTask'])->name('boards.task.update');
-    Route::post('/boards/update-tasks', [TaskController::class, 'updateTasks'])->name('boards.update-tasks');
-    Route::delete('/boards/task/delete/{id}', [TaskController::class, 'destroy'])->name('boards.task.delete');
-
-
-});
-// Task Routes
-// Route::get('/items', [TaskController::class, 'index'])->name('items.index');
-// Route::get('/items/create', [TaskController::class, 'create'])->name('items.create');
-// Route::post('/items', [TaskController::class, 'store'])->name('items.store');
-// Route::get('/items/{item}/edit', [TaskController::class, 'edit'])->name('items.edit');
-// Route::put('/items/{item}', [TaskController::class, 'update'])->name('items.update');
-// Route::delete('/items/{item}', [TaskController::class, 'destroy'])->name('items.destroy');
-
-Route::middleware(['auth', 'verified'])->group(function () {
-
-    Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
-    Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
-    Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
-    Route::post('/tasks/{task}/upload-file', [TaskController::class, 'uploadFile'])->name('tasks.uploadFile');
-    Route::post('/tasks/{task}/upload-files', [TaskController::class, 'uploadFiles'])->name('tasks.uploadFiles');
-    Route::delete('/tasks/delete-file/{mediaId}', [TaskController::class, 'deleteFile'])->name('tasks.deleteFile');
-    Route::patch('/tasks/{task}/archive', [TaskController::class, 'archive'])->name('tasks.archive');
-    Route::patch('/tasks/{task}/unarchive', [TaskController::class, 'unarchive'])->name('tasks.unarchive');
-
-    // Route::get('/tasks/{task}/edit', [TaskController::class, 'getTaskWithFiles'])->name('tasks.editWithFiles');
-});
-
-
-
-
 Route::middleware('auth')->group(function () {
     Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
     Route::get('/comments/{comment}', [CommentController::class, 'show'])->name('comments.show');
@@ -189,7 +142,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/workspaces/{workspace}', [WorkspaceController::class, 'show'])->name('workspaces.show');
     Route::post('/workspaces/{workspace}/boards', [WorkspaceController::class, 'storeBoard'])->name('workspaces.board.create');
     Route::get('/workspaces/{workspace}/boards/{board}', [WorkspaceController::class, 'showWorkspaceBoard'])->name('workspaces.board.show');
-    // Route::post('/workspaces/{workspace}/boards/{board}/create-task', [BoardTaskController::class, 'storeTask'])->name('boards.task.store');
 
 });
 
@@ -197,15 +149,14 @@ Route::middleware(['auth', 'verified'])->prefix('workspaces/{workspace}/boards/{
 
     Route::get('/tasks', [BoardTaskController::class, 'index'])->name('board.tasks.index');
     Route::post('/tasks', [BoardTaskController::class, 'store'])->name('boards.task.store');
-    Route::put('/tasks/{task}', [BoardTaskController::class, 'update'])->name('board.tasks.update');
+    // Route::post('/tasks/{task}', [BoardTaskController::class, 'update'])->name('board.tasks.update');
     Route::post('/tasks/{task}/upload-file', [BoardTaskController::class, 'uploadFile'])->name('board.tasks.uploadFile');
     Route::post('/tasks/{task}/upload-files', [BoardTaskController::class, 'uploadFiles'])->name('board.tasks.uploadFiles');
     Route::delete('/tasks/delete-file/{mediaId}', [BoardTaskController::class, 'deleteFile'])->name('board.tasks.deleteFile');
     Route::patch('/tasks/{task}/archive', [BoardTaskController::class, 'archive'])->name('board.tasks.archive');
     Route::patch('/tasks/{task}/unarchive', [BoardTaskController::class, 'unarchive'])->name('board.tasks.unarchive');
-    Route::post('/update-task/{id}', [BoardTaskController::class, 'updateTask'])->name('board.task.update');
+    Route::post('/tasks/{task}', [BoardTaskController::class, 'updateTask'])->name('board.tasks.update');
     Route::post('/update-tasks', [BoardTaskController::class, 'updateTasks'])->name('board.update-tasks');
     Route::delete('/task-delete/{id}', [BoardTaskController::class, 'destroy'])->name('board.task.delete');
-    // Route::get('/tasks/{task}/edit', [TaskController::class, 'getTaskWithFiles'])->name('tasks.editWithFiles');
 });
 

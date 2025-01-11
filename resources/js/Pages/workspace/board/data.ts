@@ -28,6 +28,7 @@ export interface TaskTypes {
     files: any
     media: any
     comment_count: number
+    due_date_iso: string
     user_avatar: {
 	// userAvatar: {
 		id: string

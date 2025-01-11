@@ -26,20 +26,20 @@ const MENU_ITEMS: MenuItemTypes[] = [
         isTitle: false,
 		icon: 'ri-home-4-line'
     },
-    {
-        key: 'boards',
-        label: 'Boards',
-        url: '/boards',
-        isTitle: false,
-		icon: 'ri-pages-line',
-    },
-    {
-        key: 'workspaces',
-        label: 'Workspaces',
-        url: '/workspaces',
-        isTitle: false,
-		icon: 'ri-pages-line',
-    },
+    // {
+    //     key: 'boards',
+    //     label: 'Boards',
+    //     url: '/boards',
+    //     isTitle: false,
+	// 	icon: 'ri-pages-line',
+    // },
+    // {
+    //     key: 'workspaces',
+    //     label: 'Workspaces',
+    //     url: '/workspaces',
+    //     isTitle: false,
+	// 	icon: 'ri-pages-line',
+    // },
 
 	// {
 	// 	key: 'pages',
