@@ -1,6 +1,6 @@
 import { Link, usePage } from "@inertiajs/react";
 import VerticalLayout from '../../layouts/Vertical';
-import { ModalLayout } from '../../components/HeadlessUI'
+// import { ModalLayout } from '../../components/HeadlessUI'
 import { useForm} from '@inertiajs/react';
 // components
 import { FormInput} from '../../components'
@@ -39,25 +39,23 @@ const WorkspaceList = () => {
 		<>
             <VerticalLayout {...props}>
                 <div>
-                <h1>Your Workspaces</h1>
-                <ul>
-                    {workspaces.map((workspace:any) => (
-                    <li key={workspace.id}>
-                        <Link href={`/workspaces/${workspace.id}`}>{workspace.name}</Link>
-                    </li>
-                    ))}
-                </ul>
-                {/* <Link href="/workspaces/create" className="btn btn-primary"> */}
-                <button type="button" onClick={() => toggleNewWorkspaceModal()} className="btn btn-primary">
-                    Create New Workspace
-                </button>
+                    <h1>Your Workspaces</h1>
+                    <ul>
+                        {workspaces.map((workspace:any) => (
+                        <li key={workspace.id}>
+                            <Link href={`/workspaces/${workspace.id}`}>{workspace.name}</Link>
+                        </li>
+                        ))}
+                    </ul>
+                    <button type="button" onClick={() => toggleNewWorkspaceModal()} className="btn btn-primary">
+                        Create New Workspace
+                    </button>
 
-                {/* </Link> */}
                 </div>
 
 
                 {/* Add New Task Modal */}
-                <ModalLayout showModal={newWorkspaceModal} toggleModal={() => toggleNewWorkspaceModal()} panelClassName="mt-8 rounded-none min-w-[768px]" aria-hidden="true">
+                {/* <ModalLayout showModal={newWorkspaceModal} toggleModal={() => toggleNewWorkspaceModal()} panelClassName="mt-8 rounded-none min-w-[768px]" aria-hidden="true">
                     <div className="duration-300 ease-in-out transition-all sm:max-w-3xl sm:w-full sm:mx-auto flex flex-col bg-white shadow-sm rounded dark:bg-gray-800">
                         <div className="flex justify-between items-center py-3 px-6 border-b dark:border-gray-700">
                             <h3 className="font-medium text-gray-600 dark:text-white text-base">Create New Task</h3>
@@ -77,9 +75,6 @@ const WorkspaceList = () => {
 
 
                                 <div className="flex justify-end items-center gap-2">
-                                    {/* <button className="btn bg-light text-gray-800 transition-all dark:bg-gray-700 dark:text-gray-100" type="button" onClick={toggleNewTaskModal}>
-                                        Close
-                                    </button> */}
                                     <button
                                         type="submit"
                                         disabled={processing}
@@ -91,7 +86,7 @@ const WorkspaceList = () => {
                             </form>
                         </div>
                     </div>
-                </ModalLayout>
+                </ModalLayout> */}
             </VerticalLayout>
         </>
   );
