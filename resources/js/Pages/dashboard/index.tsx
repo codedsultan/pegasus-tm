@@ -91,4 +91,4 @@ const WorkspaceList = () => {
    )
 }
 
-export default WorkspaceList;
+export default WorkspaceList
