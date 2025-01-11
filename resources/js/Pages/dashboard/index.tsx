@@ -4,7 +4,7 @@ import { ModalLayout } from '../../components/HeadlessUI'
 import { useForm} from '@inertiajs/react';
 // components
 import { FormInput} from '../../components'
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const WorkspaceList = () => {
 
