@@ -29,6 +29,8 @@ class BoardTaskController extends Controller
             'title' => 'Task Board',
             'description' => 'Attex React is a free and open-source admin dashboard template built with React and Tailwind CSS. It is designed to be easily customizable and includes a wide range of features and components to help you build your own dashboard quickly and efficiently.',
             'tasks' => $tasks,
+            //load task with comments where parent_id is null and replies
+
             'task' =>
             // Inertia::defer(
                 fn () => $request->has('task') ? $task?->load(['assignees','media','comments.user','comments.replies.user']) : null,

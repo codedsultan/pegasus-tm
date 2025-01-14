@@ -60,6 +60,13 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword 
     }
 
     protected $appends = ['avatar','fullname','avatar_img'];
+
+    protected function type(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) =>  ["user"][$value],
+        );
+    }
     public function avatar(): Attribute
     {
         return Attribute::get(fn () => CreateAvatar::run($this->first_name, $this->email, null, null, 'initials'));

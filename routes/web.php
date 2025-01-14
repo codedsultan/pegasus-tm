@@ -160,3 +160,4 @@ Route::middleware(['auth', 'verified'])->prefix('workspaces/{workspace}/boards/{
     Route::delete('/task-delete/{id}', [BoardTaskController::class, 'destroy'])->name('board.task.delete');
 });
 
+require __DIR__.'/../routes/admin.php';
