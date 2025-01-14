@@ -15,6 +15,7 @@ declare module 'ziggy-js' {
         }
     ],
     "verification.send": [],
+    "dashboard.index": [],
     "password.email": [],
     "password.reset": [
         {
@@ -24,25 +25,208 @@ declare module 'ziggy-js' {
     ],
     "password.update": [],
     "logout": [],
-    "boards.index": [],
-    "boards.task.update": [
+    "comments.store": [],
+    "comments.show": [
         {
-            "name": "id",
+            "name": "comment",
             "required": true
         }
     ],
-    "boards.update-tasks": [],
-    "boards.task.delete": [
+    "comments.destroy": [
         {
-            "name": "id",
+            "name": "comment",
             "required": true
         }
     ],
-    "tasks.index": [],
-    "tasks.store": [],
-    "tasks.update": [
+    "comments.getReplies": [
+        {
+            "name": "comment",
+            "required": true
+        }
+    ],
+    "comments.storeReply": [
+        {
+            "name": "comment",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "workspaces.index": [],
+    "workspaces.create": [],
+    "workspaces.store": [],
+    "workspaces.show": [
+        {
+            "name": "workspace",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "workspaces.board.create": [
+        {
+            "name": "workspace",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "workspaces.board.show": [
+        {
+            "name": "workspace",
+            "required": true,
+            "binding": "id"
+        },
+        {
+            "name": "board",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "board.tasks.index": [
+        {
+            "name": "workspace",
+            "required": true
+        },
+        {
+            "name": "board",
+            "required": true
+        }
+    ],
+    "boards.task.store": [
+        {
+            "name": "workspace",
+            "required": true,
+            "binding": "id"
+        },
+        {
+            "name": "board",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "board.tasks.uploadFile": [
+        {
+            "name": "workspace",
+            "required": true,
+            "binding": "id"
+        },
+        {
+            "name": "board",
+            "required": true,
+            "binding": "id"
+        },
         {
             "name": "task",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "board.tasks.uploadFiles": [
+        {
+            "name": "workspace",
+            "required": true,
+            "binding": "id"
+        },
+        {
+            "name": "board",
+            "required": true,
+            "binding": "id"
+        },
+        {
+            "name": "task",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "board.tasks.deleteFile": [
+        {
+            "name": "workspace",
+            "required": true,
+            "binding": "id"
+        },
+        {
+            "name": "board",
+            "required": true,
+            "binding": "id"
+        },
+        {
+            "name": "mediaId",
+            "required": true
+        }
+    ],
+    "board.tasks.archive": [
+        {
+            "name": "workspace",
+            "required": true,
+            "binding": "id"
+        },
+        {
+            "name": "board",
+            "required": true,
+            "binding": "id"
+        },
+        {
+            "name": "task",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "board.tasks.unarchive": [
+        {
+            "name": "workspace",
+            "required": true,
+            "binding": "id"
+        },
+        {
+            "name": "board",
+            "required": true,
+            "binding": "id"
+        },
+        {
+            "name": "task",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "board.tasks.update": [
+        {
+            "name": "workspace",
+            "required": true,
+            "binding": "id"
+        },
+        {
+            "name": "board",
+            "required": true,
+            "binding": "id"
+        },
+        {
+            "name": "task",
+            "required": true
+        }
+    ],
+    "board.update-tasks": [
+        {
+            "name": "workspace",
+            "required": true,
+            "binding": "id"
+        },
+        {
+            "name": "board",
+            "required": true,
+            "binding": "id"
+        }
+    ],
+    "board.task.delete": [
+        {
+            "name": "workspace",
+            "required": true,
+            "binding": "id"
+        },
+        {
+            "name": "board",
+            "required": true,
+            "binding": "id"
+        },
+        {
+            "name": "id",
             "required": true
         }
     ],

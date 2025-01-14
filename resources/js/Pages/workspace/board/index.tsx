@@ -3,8 +3,6 @@ import { Head, Link, usePage } from '@inertiajs/react';
 
 import { TaskTypes ,AssigneeTypes, UserTypes} from './data'
 import { DragDropContext, Draggable, DropResult, Droppable } from 'react-beautiful-dnd'
-import * as yup from 'yup'
-import { yupResolver } from '@hookform/resolvers/yup'
 
 // import { useForm } from 'react-hook-form'
 import { useForm ,router} from '@inertiajs/react';
@@ -12,13 +10,12 @@ import { useForm ,router} from '@inertiajs/react';
 import TaskItem from './TaskItem'
 
 // components
-import { FormInput, CustomDatepicker, PageBreadcrumb ,FileUploader} from '../../components'
-import { ModalLayout } from '../../components/HeadlessUI'
+import { FormInput, CustomDatepicker, PageBreadcrumb ,FileUploader} from '../../../components'
+import { ModalLayout } from '../../../components/HeadlessUI'
 import { Tab } from '@headlessui/react'
 import VerticalLayout from '@/layouts/Vertical';
-import Task from '../apps/Tasks/TasksDetails/Task';
+import Task from '../../apps/Tasks/TasksDetails/Task';
 import { route } from 'vendor/tightenco/ziggy/src/js';
-import { FileType } from '@/components/FileUploader';
 
 interface StateType {
 	todoTasks: TaskTypes[]
@@ -31,8 +28,6 @@ interface CommentFormState {
     content: string; // The main content of the comment
     errors: Record<string, string>; // A dictionary for form field errors
     attachments: File[]; // An array of attached files
-    // 'task_id' => 'required|integer',
-    //         'parent_id' => 'nullable|integer',
     taskId?: number;
     parentId?: number;
     isReply?: boolean;
@@ -52,8 +47,8 @@ interface TaskFormData {
     status?: string;
     priority?: string;
     files?: any[] ;
-
-    // Define 'assignees' as an array of strings
+    boardId?: number;
+    workspaceId?: number;
 }
 
 interface Comment {
@@ -79,8 +74,9 @@ interface Comment {
 
 
 const KanbanApp = () => {
-    // const { post, patch } = useForm();
     const props = usePage().props;
+    const workspace : any = usePage().props?.workspace;
+    const board : any = usePage().props?.board;
     const { data, setData, post, processing, reset, errors } = useForm({
 		category: '',
 		title: '',
@@ -89,13 +85,9 @@ const KanbanApp = () => {
 		assignTo: '',
 		dueDate: new Date(),
 		status: 'Todo',
+        boardId: board?.id,
+        workspaceId: workspace?.id,
 	});
-
-    // const tempData: {
-    //     sourceId?: string | null;
-    //     destinationId?: string | null;
-    //     updatedState?: any;
-    // } = {};
 
     const updateTasks = useForm({
         sourceId: '',
@@ -121,7 +113,6 @@ const KanbanApp = () => {
 
 	const BreadcrumbChild = () => {
 		return (
-			// 768
 			<button
 				className="btn btn-sm !rounded bg-success text-white"
 				type="button"
@@ -134,19 +125,6 @@ const KanbanApp = () => {
 			</button>
 		)
 	}
-
-	/*
-	 * Form validation schema
-	 */
-	const schemaResolver = yupResolver(
-		yup.object().shape({
-			category: yup.string().required(),
-			title: yup.string().required(),
-			priority: yup.string().required(),
-			description: yup.string().required(),
-			assignTo: yup.string().required(),
-		})
-	)
 
     // Handles input changes
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -164,21 +142,8 @@ const KanbanApp = () => {
 		e.preventDefault();
 		// Include the status and queue from the current modal details
 		setData('status', newTaskDetails.status);
-		post('/tasks', {
+		post(route('boards.task.store',{id:board?.id,workspace:workspace?.id,board:board?.id}), {
 			onSuccess: () => {
-
-				// Add the new task to the correct state queue
-				// const newTask = {
-				// 	...data,
-				// 	id: totalTasks + 1,
-				// };
-				// const modifiedState: any = { ...state };
-				// const tasks = [...getList(newTaskDetails.queue), newTask];
-				// modifiedState[newTaskDetails.queue] = [...tasks];
-				// setState(modifiedState);
-
-				// Close the modal and reset the form
-				// reset();
 				setNewTaskModal(false);
                 refreshTaskList();
 				// setTotalTasks(totalTasks + 1);
@@ -199,20 +164,19 @@ const KanbanApp = () => {
 
     const { task } = usePage<{ task: TaskTypes | null }>().props;
     const currentUrl = new URL(window.location.href);
-    // var isCurrentTask: boolean = currentUrl.searchParams.get('task')?.toString() === task?.id?.toString() && currentUrl.searchParams.get('task')?.toString() !== undefined && currentUrl.searchParams.get('update')?.toString() === undefined;
+    const emptyTaskParam = currentUrl.searchParams.get('task')?.toString() !== "";
+    // console.log('task param:: '+ emptyTaskParam);
+    var isCurrentTask: boolean =  currentUrl.searchParams.get('task')?.toString() !== undefined && currentUrl.searchParams.get('task')?.toString() !== "" && currentUrl.searchParams.get('update')?.toString() === undefined   ;
     // var isCurrentUpdateTask: boolean = currentUrl.searchParams.get('update')?.toString() === task?.id?.toString() && currentUrl.searchParams.get('update')?.toString() !== undefined;
-    var isCurrentTask: boolean =  currentUrl.searchParams.get('task')?.toString() !== undefined && currentUrl.searchParams.get('update')?.toString() === undefined;
-    var isCurrentUpdateTask: boolean = currentUrl.searchParams.get('update')?.toString() === task?.id?.toString() && currentUrl.searchParams.get('update')?.toString() !== undefined;
+    // var isCurrentDeleteTask: boolean = usePage().props.deleted === currentUrl.searchParams.get('task')?.toString() && currentUrl.searchParams.get('deleted')?.toString() !== undefined;
+    // console.log('is current task ::' + isCurrentTask + '--searchParams ::' + currentUrl.searchParams.get('task')?.toString() + 'Task id::' + task?.id?.toString() + Date.now());
+    // console.log('deleted props ::' + currentUrl.searchParams.get('deleted')?.toString());
 
-    console.log('is current task ::' + isCurrentTask + '--searchParams ::' + currentUrl.searchParams.get('task')?.toString() + 'Task id::' + task?.id?.toString() + Date.now());
-    // const [isOpen, setIsOpen] = useState(isCurrenTask);
-    // const [currentTask, setCurrentTask] = useState(null);
-
+    // console.log('is delete task ::' + isCurrentDeleteTask + '--searchParams ::' + currentUrl.searchParams.get('deleted')?.toString() + 'Task id::' + currentUrl.searchParams.get('task')?.toString());
     const [descriptionModal, setDescriptionModal] = useState<boolean>(isCurrentTask)
+
     const [updateTaskModal, setUpdateTaskModal] = useState<boolean>(false)
 
-
-    // const [selectedFiles, setSelectedFiles] = useState<FileType[]>([])
     const updateTaskForm = useForm<TaskFormData>({
         title: '',
         priority: '',
@@ -222,9 +186,9 @@ const KanbanApp = () => {
         status: '',
         assignees: [],
         files: [],
+        boardId: board?.id,
+        workspaceId: workspace?.id,
     });
-
-
 
 
     const { setData: updateForm } = updateTaskForm;
@@ -233,127 +197,47 @@ const KanbanApp = () => {
 		updateTaskForm.setData('dueDate', date);
 	};
 
-    // const [files, setFiles] = useState<File[]>([]);
-    // const [taskFileUpload, settaskFileUpload] = useState({
-    //         name: '',
-    //         files: [],
-    // });
-
-    // const handleFileChange = (e) => {
-    //     settaskFileUpload({
-    //         ...taskFileUpload,
-    //         files: [...e.target.files], // Store the selected files as an array
-    //     });
-    // };
     const deleteFile = (fileId: any) => {
-        // const updatedFiles = selectedFiles.filter((f) => f !== file);
-        // setSelectedFiles(updatedFiles);
-        router.delete(route('tasks.deleteFile',{mediaId:fileId}),{
+        router.delete(route('board.tasks.deleteFile',{workspace:workspace?.id,board:board?.id,mediaId:fileId}),{
             onSuccess: () => {
                 console.log('File deleted successfully');
             },
         });
     };
     const handleTaskFileUpload = (files: any[]) => {
-        // e.preventDefault();
-
         const formData = new FormData();
         formData.append('id', task?.id?.toString() || '');
-
-        // Append each file
-        // form.files.forEach((file) => {
-        //     formData.append('files[]', file); // Add files to the FormData
-        // });
         files.forEach((file) => {
             formData.append('files[]', file); // Add files to the FormData
         });
         // Send the request
         console.log('FormData:', formData);
 
-        router.post(route('tasks.uploadFiles',{id:task?.id}), formData, {
+        router.post(route('board.tasks.uploadFiles',{workspace:workspace?.id,board:board?.id,task:task?.id}), formData, {
             headers: {
                 'Content-Type': 'multipart/form-data', // Optional; FormData sets this automatically
             },
             onFinish: () => {
-                console.log('File upload complete');
+                // console.log('File upload complete');
                 // files = [];
             },
         });
 
     };
-    // useEffect(() => {
-    //    if(taskFileUpload.files.length > 0){
-    //        console.log('files', taskFileUpload.files);
-    //        handleTaskFileUpload(taskFileUpload);
-    //     //    updateTaskForm.setData((data) => ({
-    //     //        ...data,
-    //     //        files: taskFileUpload.files,
-    //     //    }));
-    //    }
-    // }, [taskFileUpload]);
-    // const [files, setFiles] = useState<File[]>([]);
-    // const handleFileChange = (e: any) => {
-    //     setFiles([...e.target.files]);
 
-    //     router.post(route('boards.task.update',{id:task?.id,update:task?.id}), {
-    //         __method: 'put',
-    //         headers: {
-    //             'Content-Type': 'multipart/form-data',
-    //         },
-    //         files : files,
-    //     });// Update state with selected files
-    // };
-    // const handleFileUpload = (xfiles: any[]) => {
-        // updateTaskForm.setData('files', files);
-        // setSelectedFiles(files)
-        // const formData = new FormData();
-        // xfiles.forEach((file, index) => {
-        //     console.log('File:', file.formattedSize);
-        //     formData.append(`files[${index}]`, file.formattedSize); // Add files to FormData
-        // });
-        // updateTaskForm.setData((data:any) => ({
-        //     ...data,
-        //     files: formData,
-        // }));
-
-        // setFiles([...e.target.files]);
-
-        // router.post(route('boards.task.update',{id:task?.id,update:task?.id}), {
-        //     __method: 'put',
-        //     headers: {
-        //         'Content-Type': 'multipart/form-data',
-        //     },
-        //     files : xfiles,
-        // });
-        // updateTaskForm.setData('files', formData);
-        // updateTaskForm.data.formData = formData;
-        // updateTaskForm.refresh();
-        // console.log('Uploaded files:', xfiles);
-
-        // You can process files here, e.g., send to server
-    // };
     const toggleUpdateTaskModal = (task:any) => {
         updateTaskForm.clearErrors();
-        // console.log('in handleUpdateTask ::' + 'task :' + updateTaskForm?.data?.title);
-        // setCurrentTask(task);
-        // setDescriptionModal(false);
         setUpdateTaskModal((prevState) => {
             const newState = !prevState;
-            // console.log('in toggleUpdateTaskModal :: state:', newState); // Correctly log the new state
             return newState;
         });
 
 
         router.get(
-            route('boards.index'),
+            route('workspaces.board.show',{workspace:workspace?.id,board:board?.id}),
             !updateTaskModal ? { task: task?.id , update: task?.id } : { task: null , update: null },
             {
               onSuccess: () => {
-                // isCurrentUpdateTask = currentUrl.searchParams.get('update')?.toString() !== undefined;
-                // isCurrentTask = false;
-                // currentUrl.searchParams.get('task')?.toString() === task?.id?.toString() && currentUrl.searchParams.get('task')?.toString() !== undefined && currentUrl.searchParams.get('task')?.toString() !== null;
-
-
                 updateTaskForm.setData({
                     title: task?.title,
                     priority: task?.priority,
@@ -364,8 +248,6 @@ const KanbanApp = () => {
                     assignees: task?.assignee_ids,
                     // files: task?.files,
                 });
-
-
               },
               preserveState: true,
               preserveScroll: true,
@@ -374,33 +256,17 @@ const KanbanApp = () => {
           );
 
     }
-
-
     // isCurrentUpdateTask && toggleUpdateTaskModal(task);
     const handleUpdateTask = (e: React.FormEvent) => {
-
-
         e.preventDefault();
-
-
-
         console.log('in handleUpdateTask ::' + 'task :' + task);
-        // Include the status and queue from the current modal details
-        // setData('status', task?.status);
-        // router.post(route('boards.task.update',{id:task?.id,update:task?.id}), {
-        //     headers: {
-        //         'Content-Type': 'multipart/form-data',
-        //     },
-        //     files: updateTaskForm?.data.files,
-        // });
-        updateTaskForm.post(route('boards.task.update',{id:task?.id,update:task?.id}), {
+        updateTaskForm.post(route('board.tasks.update',{workspace:workspace?.id,board:board?.id,task:task?.id,update:task?.id}), {
             preserveScroll: true,
             preserveState: true,
             onSuccess: () => {
-                refreshTaskList();
+                refreshTaskList(task);
             },
             onError: (error) => {
-                // setUpdateTaskModal(true);
                 console.log('in handleUpdateTask ::' + 'error :' + error);
             },
         });
@@ -414,14 +280,12 @@ const KanbanApp = () => {
             });
 
             router.get(
-              route('boards.index'),
+              route('workspaces.board.show',{workspace:workspace?.id,board:board?.id}),
               !descriptionModal ? { task: task?.id } : { task: null },
               {
                 onSuccess: () => {
                   console.log('in toggleDescriptionModal ::' + 'onSuccess');
                   isCurrentTask = currentUrl.searchParams.get('task')?.toString() === task?.id?.toString();
-
-                //   setDescriptionModal((prevState) => !prevState)
                 },
                 preserveState: true,
                 preserveScroll: true,
@@ -430,20 +294,12 @@ const KanbanApp = () => {
             );
 
         console.log('in toggleDescriptionModal ::' + 'after state :' + descriptionModal);
-
-
 	}
-    // , [task]);
-
 
     useEffect(() => {
         setDescriptionModal(isCurrentTask);
     }, [isCurrentTask]);
 
-    // useEffect(() => {
-    //     updateTaskForm.setData('files', selectedFiles);
-    //     console.log('Form data updated:', updateTaskForm.data.files);
-    // }, [selectedFiles]);
 	/**
 	 * Creates new empty task with given status
 	 * @param status
@@ -462,15 +318,6 @@ const KanbanApp = () => {
 	 * When date changes
 	 * @param {} date
 	 */
-	// const handleDateChange = (date: Date) => {
-	// 	if (newTaskDetails) {
-	// 		// setState({
-	// 		//     ...state,
-	// 		//     newTask: { ...state.newTask, dueDate: date },
-	// 		// });
-	// 		setNewTaskDetails({ ...newTaskDetails, dueDate: date })
-	// 	}
-	// }
 
 	// a little function to help us with reordering the result
 	const reorder = (list: any[], startIndex: number, endIndex: number) => {
@@ -553,7 +400,7 @@ const KanbanApp = () => {
         updateTasks.setData('updatedState', updatedState);
 
         console.log('in persist changes about to call ::' + 'source id:' + tempData.sourceId + ' destination id:' + tempData.destinationId);
-        router.post('/boards/update-tasks', tempData)
+        router.post(`/workspaces/${workspace?.id}/boards/${board?.id}/update-tasks`, tempData)
 
     };
 
@@ -562,23 +409,31 @@ const KanbanApp = () => {
 	 */
 
 	const deleteTask = (taskId:any) => {
-            router.delete(route('boards.task.delete',{id:taskId}), {
+            router.delete(route('board.task.delete',{workspace:workspace?.id,board:board?.id,id:taskId}), {
                 preserveScroll: true,
                 onSuccess: () => {
+                    setDescriptionModal(false);
                     console.log('in deleteTask ::' + 'onSuccess');
                     refreshTaskList();
                 },
             });
       };
 
-      const refreshTaskList = () => {
-        router.visit(route('boards.index',{ task: task?.id }), {
-            only: ['tasks','task'],
-        })
+      const refreshTaskList = (task?:any) => {
+        if(task?.id){
+            router.visit(route('workspaces.board.show',{workspace:workspace?.id,board:board?.id, task: task?.id }), {
+                only: ['tasks','task'],
+            })
+        }
+        else{
+            router.visit(route('workspaces.board.show',{workspace:workspace?.id,board:board?.id}), {
+                only: ['tasks'],
+            })
+        }
       };
 
       const archiveTask = (task:any) => {
-        router.patch(route('tasks.archive',{id:task?.id}), {}, {
+        router.patch(route('board.tasks.archive',{workspace:workspace?.id,board:board?.id,task:task?.id}), {}, {
             preserveState: true,
             preserveScroll: true,
             onSuccess: () => {
@@ -589,11 +444,11 @@ const KanbanApp = () => {
       };
 
     //   const commentsProps = usePage().props?.tcomments;
-      const [comments, setComments] = useState<any>([]);
+    const [comments, setComments] = useState<any>([]);
 
-      useEffect(() => {
-        setComments(task?.comments);
-      }, [task?.comments]);
+    useEffect(() => {
+    setComments(task?.comments);
+    }, [task?.comments]);
 
 
     const [commentForm, setCommentForm] = useState<CommentFormState>({
@@ -637,8 +492,6 @@ const KanbanApp = () => {
 
     const [childreplyingTo, setChildReplyingTo] = useState(null);
 
-
-
     const handleReplyingTo = (commentId: number, repliedTo: number) => {
         // e.preventDefault();
 
@@ -657,10 +510,6 @@ const KanbanApp = () => {
     }
 
     const handleChildReplyingTo = (commentId: number, repliedTo: number, quotedUser: string) => {
-        // e.preventDefault();
-
-        console.log('in handleChildReplyingTo ::' + 'commentId:' + commentId + ' repliedTo:' + repliedTo + ' quotedUser:' + quotedUser);
-
         setChildReplyingTo(commentId as any);
 
         setCommentChildReplyForm({
@@ -673,14 +522,6 @@ const KanbanApp = () => {
         handleSendComment('childReply', commentId, repliedTo, quotedUser);
     };
 
-
-    //
-    // useEffect(() => {
-    //     // setCommentForm((prev) => ({
-    //     //     ...prev,
-    //     //     repliedTo: childreplyingTo,
-    //     // }));
-    // }, [childreplyingTo]);
     const updateComment = (key: string, value: any) => {
         setCommentForm((prev) => ({
         ...prev,
@@ -689,16 +530,10 @@ const KanbanApp = () => {
     };
 
     const handleCommentFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // const files = Array.from(e.target.files);
-        // setSelectedCommentFiles((prev) => [...prev, ...files]);
-        // if (e.target.files) {
+
         if (!e.target.files) return;
         // const files = Array.from(e.target.files) as File[];
         const files = Array.from(e.target.files) as FileWithPreview[];
-        // setSelectedCommentFiles(files);
-        // setSelectedCommentFiles([...files]);
-        // setSelectedCommentFiles((prev: File[]) => [...prev, ...files]);
-        // Optional: Add preview URLs for images
 
         const filesWithPreview = files.map((file) => {
             if (file.type.startsWith('image/')) {
@@ -712,11 +547,7 @@ const KanbanApp = () => {
             ...prev,
             attachments: selectedCommentFiles,
           }));
-        // setCommentForm((prev: { content: string; errors: {}; attachments: FileWithPreview[] }) => ({
-        //   ...prev,
-        //   attachments: [...prev.attachments, ...filesWithPreview],
-        // }));
-        // }
+
       };
 
       const removeCommentFile = (index: number) => {
@@ -792,6 +623,7 @@ const KanbanApp = () => {
                 });
             }
             if(type === 'reply'){
+                setReplyingTo(null);
                 setCommentReplyForm({
                     content: '',
                     errors: {},
@@ -804,6 +636,7 @@ const KanbanApp = () => {
                 });
             }
             if(type === 'childReply'){
+                setChildReplyingTo(null);
                 setCommentChildReplyForm({
                     content: '',
                     errors: {},
@@ -814,55 +647,15 @@ const KanbanApp = () => {
                     quotedUser: '',
                     attachments: [],
                 });
+
+
             }
           },
         });
     };
 
-    // const handleSendCommentReply = ( parentId?: number ,repliedTo?: number ,quotedUser?: string ) => {
-    //     const formData = new FormData();
-    //     formData.append('content', commentReplyForm.content);
-    //     if (task?.id) {
-    //         formData.append('task_id', task?.id.toString());
-    //     }
 
-    //     if (repliedTo) {
-    //         formData.append('replied_to', repliedTo?.toString());
-    //     }
-
-    //     if (quotedUser) {
-    //         formData.append('quoted_user', quotedUser);
-    //     }
-
-    //     if (parentId) {
-    //         formData.append('parent_id', parentId.toString());
-    //     }
-    //     selectedCommentFiles.forEach((file, index) => {
-    //         formData.append(`attachments[${index}]`, file);
-    //     });
-
-    //     router.post(route('comments.store'), formData, {
-    //       headers: {
-    //         'Content-Type': 'multipart/form-data',
-    //       },
-    //     preserveState: true,
-    //       onFinish: () => {
-    //         // setDescriptionModal(true);
-    //          console.log('Comment submitted successfully!');
-    //         setCommentForm({
-    //             content: '',
-    //             parentId: undefined,
-    //             isReply: false,
-    //             repliedTo: undefined,
-    //             quotedUser: '',
-    //             errors: {},
-    //             attachments: [],
-    //         });
-
-    //       },
-    //     });
-    // };
-      const renderComments = (comments:any) => {
+    const renderComments = (comments:any) => {
         return  comments.map((comment:any, idx:number) => (
                 <div key={idx} className="flex gap-5 border rounded-md border-gray-300 dark:border-gray-700 p-3 mb-2">
                     <img src={comment.user?.avatar_img || comment.user?.avatar} alt="" className="h-12 rounded-full" />
@@ -877,9 +670,6 @@ const KanbanApp = () => {
                         </button>
                         {/* Reply Form */}
                         {replyingTo === comment.id && (
-                            // <form
-                            //     className="mt-2 ml-6"
-                            // >
                             <>
                                 <textarea
                                     className="form-input w-full p-2 border rounded"
@@ -903,7 +693,6 @@ const KanbanApp = () => {
                                     </button>
                                 </div>
                             </>
-                            // </form>
                         )}
                         {comment.replies?.length > 0 ? (
                             comment.replies.map((reply:any, idx:number) => (
@@ -925,9 +714,7 @@ const KanbanApp = () => {
                                 <div>
                                     {/* ChildReply Form */}
                                     {childreplyingTo === reply.id && (
-                                        // <form
-                                        //     className="mt-2 ml-6"
-                                        // >
+
                                         <div className="mb-2 ml-6">
                                             <textarea
                                                 className="form-input w-full p-2 border rounded"
@@ -951,7 +738,6 @@ const KanbanApp = () => {
                                                 </button>
                                             </div>
                                         </div>
-                                        // </form>
                                     )}
                                 </div>
                             </div>
@@ -961,24 +747,16 @@ const KanbanApp = () => {
                                 No replies for this comment.
                             </p>
                         )}
-
-
                     </div>
                 </div>
             )
         );
-      };
+    };
 
 	return (
 		<>
             <VerticalLayout {...props}>
-                <div className="flex justify-between items-center mb-6">
-					<div className="flex gap-4">
-						<h4 className="text-slate-900 dark:text-slate-200 text-lg font-medium">{String(usePage().props?.title)}</h4>
-						<BreadcrumbChild />
-					</div>
-                </div>
-
+            <PageBreadcrumb title={{id: board?.id, name: board?.name, url: `/workspaces/${workspace?.id}/boards/${board?.id}`}} subName={{id: workspace?.id, name: workspace?.name, url: `/workspaces/${workspace?.id}`}} addedChild={<BreadcrumbChild />} />
                 <div className="grid w-full">
                     <div className="overflow-hidden text-gray-700 dark:text-slate-400">
                         <DragDropContext onDragEnd={onDragEnd}>
@@ -1291,13 +1069,11 @@ const KanbanApp = () => {
                                             {/* <textarea className="form-input mt-2" id="example-textarea" placeholder="Write message" rows={4}></textarea> */}
                                             <form className="overflow-y-auto"  encType='multipart/form-data'>
                                                 <FormInput name="commentContent" label="" type="textarea" containerClass="w-full" className="form-input" rows={3} key="commentContent" value={commentForm?.content} errors={commentForm?.errors} onChange={(e) => updateComment('content', e.target.value)} />
-                                                <div className="mb-2">
+                                                {/* <div className="mb-2">
                                                     {selectedCommentFiles.length > 0 && (
                                                         <div className="mt-4 flex items-center gap-2">
                                                             {selectedCommentFiles.map((file:any, index:number) => (
                                                                 <div key={index} className="flex items-center  ">
-                                                                    {/* <span>{file.name}</span> */}
-
                                                                     {file.preview && <img className="border rounded-md border-gray-200 p-1" src={file.preview} alt={file.name} width={40} />}
                                                                     <button
                                                                         type="button"
@@ -1310,12 +1086,12 @@ const KanbanApp = () => {
                                                             ))}
                                                         </div>
                                                     )}
-                                                </div>
+                                                </div> */}
                                                 <div className="flex items-center justify-end">
 
 
-                                                    <div className="mb-2 inline-block">
-                                                        <input
+                                                    <div className="my-2 inline-block">
+                                                        {/* <input
                                                             type="file"
                                                             multiple
                                                             onChange={handleCommentFileChange}
@@ -1324,7 +1100,7 @@ const KanbanApp = () => {
                                                         />
                                                         <label htmlFor="fileInput" className="btn btn-link text-xl cursor-pointer">
                                                             <i className="ri-attachment-2"></i>
-                                                        </label>
+                                                        </label> */}
                                                         <button type="button" onClick={() => handleSendComment('comment')}  className="btn bg-primary text-white btn-sm">
                                                             Submit
                                                         </button>
@@ -1470,9 +1246,9 @@ const KanbanApp = () => {
                                     <button type="button" onClick={() => toggleDescriptionModal(task)} className="btn btn-link text-xl">
                                         <i className="ri-delete-bin-line"></i>
                                     </button>
-                                    <button type="button" onClick={() => toggleDescriptionModal(task)} className="btn btn-link text-xl">
+                                    {/* <button type="button" onClick={() => toggleDescriptionModal(task)} className="btn btn-link text-xl">
                                         <i className="ri-archive-drawer-fill"></i>
-                                    </button>
+                                    </button> */}
 
                                 </div>
                                 <button

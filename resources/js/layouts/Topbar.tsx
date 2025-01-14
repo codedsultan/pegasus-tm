@@ -38,44 +38,44 @@ export interface NotificationItem {
  * notification items
  */
 const notifications: NotificationItem[] = [
-	{
-		id: 1,
-		text: 'Datacorp',
-		subText: 'Caleb Flakelar commented on Admin',
-		icon: 'ri-message-3-line text-lg',
-		bgColor: 'primary',
-		createdAt: subtractHours(new Date(), 1),
-	},
-	{
-		id: 2,
-		text: 'Admin',
-		subText: 'New user registered',
-		icon: 'ri-user-add-line text-lg',
-		bgColor: 'info',
-		createdAt: subtractHours(new Date(), 60),
-	},
-	{
-		id: 3,
-		text: 'Cristina Pride',
-		subText: 'Hi, How are you? What about our next meeting',
-		avatar: avatar2,
-		createdAt: subtractHours(new Date(), 1440),
-	},
-	{
-		id: 4,
-		text: 'Datacorp',
-		subText: 'Caleb Flakelar commented on Admin',
-		icon: 'ri-discuss-line text-lg',
-		bgColor: 'primary',
-		createdAt: subtractHours(new Date(), 2880),
-	},
-	{
-		id: 5,
-		text: 'Karen Robinson',
-		subText: 'Wow ! this admin looks good and awesome design',
-		avatar: avatar4,
-		createdAt: subtractHours(new Date(), 2880),
-	},
+	// {
+	// 	id: 1,
+	// 	text: 'Datacorp',
+	// 	subText: 'Caleb Flakelar commented on Admin',
+	// 	icon: 'ri-message-3-line text-lg',
+	// 	bgColor: 'primary',
+	// 	createdAt: subtractHours(new Date(), 1),
+	// },
+	// {
+	// 	id: 2,
+	// 	text: 'Admin',
+	// 	subText: 'New user registered',
+	// 	icon: 'ri-user-add-line text-lg',
+	// 	bgColor: 'info',
+	// 	createdAt: subtractHours(new Date(), 60),
+	// },
+	// {
+	// 	id: 3,
+	// 	text: 'Cristina Pride',
+	// 	subText: 'Hi, How are you? What about our next meeting',
+	// 	avatar: avatar2,
+	// 	createdAt: subtractHours(new Date(), 1440),
+	// },
+	// {
+	// 	id: 4,
+	// 	text: 'Datacorp',
+	// 	subText: 'Caleb Flakelar commented on Admin',
+	// 	icon: 'ri-discuss-line text-lg',
+	// 	bgColor: 'primary',
+	// 	createdAt: subtractHours(new Date(), 2880),
+	// },
+	// {
+	// 	id: 5,
+	// 	text: 'Karen Robinson',
+	// 	subText: 'Wow ! this admin looks good and awesome design',
+	// 	avatar: avatar4,
+	// 	createdAt: subtractHours(new Date(), 2880),
+	// },
 ]
 
 /**
@@ -211,58 +211,93 @@ const Topbar = () => {
 
 	return (
 		<React.Fragment>
-			<header className="app-header flex items-center px-4 gap-3.5">
-				<LogoBox />
+			<header className="app-header flex items-center ">
+                <div className="app-header flex justify-between items-center gap-3.5 w-full">
+                    <div className="px-4 flex items-center">
+                        <LogoBox />
 
-				<button id="button-toggle-menu" className="nav-link p-2" onClick={handleLeftMenuCallBack}>
-					<span className="sr-only">Menu Toggle Button</span>
-					<span className="flex items-center justify-center">
-						<i className="ri-menu-2-fill text-2xl"></i>
-					</span>
-				</button>
+                        <button id="button-toggle-menu" className="nav-link p-2" onClick={handleLeftMenuCallBack}>
+                            <span className="sr-only">Menu Toggle Button</span>
+                            <span className="flex items-center justify-center">
+                                <i className="ri-menu-2-fill text-2xl"></i>
+                            </span>
+                        </button>
 
-				<div className="relative hidden lg:block">
-					<TopBarSearch />
-				</div>
+                        {/* <div className="relative hidden lg:block">
+                            <TopBarSearch />
+                        </div> */}
 
-				<div className="relative ms-auto">
-					<LanguageDropdown />
-				</div>
+                        {/* <div className="relative ms-auto">
+                            <LanguageDropdown />
+                        </div> */}
 
-				<div className="relative lg:flex hidden">
-					<NotificationDropdown notifications={notifications} />
-				</div>
+                        {/* <div className="relative lg:flex hidden">
+                            <NotificationDropdown notifications={notifications} />
+                        </div> */}
 
-				<div className="relative lg:flex hidden">
-					<AppsDropDown />
-				</div>
+                        {/* <div className="relative lg:flex hidden">
+                            <AppsDropDown />
+                        </div> */}
 
-				<div className="flex">
-					<button type="button" className="nav-link p-2" onClick={handleRightSideBar}>
-						<span className="sr-only">Customization</span>
-						<span className="flex items-center justify-center">
-							<i className="ri-settings-3-line text-2xl"></i>
-						</span>
-					</button>
-				</div>
+                        {/* <div className="flex">
+                            <button type="button" className="nav-link p-2" onClick={handleRightSideBar}>
+                                <span className="sr-only">Customization</span>
+                                <span className="flex items-center justify-center">
+                                    <i className="ri-settings-3-line text-2xl"></i>
+                                </span>
+                            </button>
+                        </div> */}
 
-				<div className="lg:flex hidden">
-					<button id="light-dark-mode" type="button" className="nav-link p-2" onClick={toggleDarkMode}>
-						<span className="sr-only">Light/Dark Mode</span>
-						<span className="flex items-center justify-center">
-							<i className="ri-moon-line text-2xl block dark:hidden"></i>
-							<i className="ri-sun-line text-2xl hidden dark:block"></i>
-						</span>
-					</button>
-				</div>
+                        {/* <div className="lg:flex hidden">
+                            <button id="light-dark-mode" type="button" className="nav-link p-2" onClick={toggleDarkMode}>
+                                <span className="sr-only">Light/Dark Mode</span>
+                                <span className="flex items-center justify-center">
+                                    <i className="ri-moon-line text-2xl block dark:hidden"></i>
+                                    <i className="ri-sun-line text-2xl hidden dark:block"></i>
+                                </span>
+                            </button>
+                        </div> */}
 
-				<div className="md:flex hidden">
-					<MaximizeScreen />
-				</div>
+                        {/* <div className="md:flex hidden">
+                            <MaximizeScreen />
+                        </div> */}
+                    </div>
+                    <div className="flex justify-end">
+                        <div className="relative lg:flex hidden">
+                            <NotificationDropdown notifications={notifications} />
+                        </div>
 
-				<div className="relative">
-					<ProfileDropDown profiliePic={profilePic} menuItems={profileMenus} username={auth?.user?.first_name} userTitle="Founder" />
-				</div>
+                        {/* <div className="relative lg:flex hidden">
+                            <AppsDropDown />
+                        </div> */}
+
+                        <div className="flex">
+                            <button type="button" className="nav-link p-2" onClick={handleRightSideBar}>
+                                <span className="sr-only">Customization</span>
+                                <span className="flex items-center justify-center">
+                                    <i className="ri-settings-3-line text-2xl"></i>
+                                </span>
+                            </button>
+                        </div>
+
+                        <div className="lg:flex hidden">
+                            <button id="light-dark-mode" type="button" className="nav-link p-2" onClick={toggleDarkMode}>
+                                <span className="sr-only">Light/Dark Mode</span>
+                                <span className="flex items-center justify-center">
+                                    <i className="ri-moon-line text-2xl block dark:hidden"></i>
+                                    <i className="ri-sun-line text-2xl hidden dark:block"></i>
+                                </span>
+                            </button>
+                        </div>
+
+                        <div className="md:flex hidden ">
+                            <MaximizeScreen />
+                        </div>
+                        <div className=" relative">
+                            <ProfileDropDown profiliePic={profilePic} menuItems={profileMenus} username={auth?.user?.first_name} userTitle="Founder" />
+                        </div>
+                    </div>
+                </div>
 			</header>
 		</React.Fragment>
 	)

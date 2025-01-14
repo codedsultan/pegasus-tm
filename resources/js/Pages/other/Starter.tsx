@@ -1,5 +1,3 @@
-// components
-
 import { route } from 'vendor/tightenco/ziggy/src/js';
 import { PageBreadcrumb } from '../../components'
 import VerticalLayout from '../../layouts/Vertical';

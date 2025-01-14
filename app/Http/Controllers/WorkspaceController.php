@@ -18,14 +18,18 @@ class WorkspaceController extends Controller
     public function index(Request $request)
     {
         $workspaces = $request->user()->workspaces()->with('boards.tasks')->get();
-        return Inertia::render('dashboard/index', ['workspaces' => $workspaces]);
+        $ownedWorkspaces = $request->user()->ownedWorkspaces()->with('boards.tasks')->get();
+        return Inertia::render('workspace/WorkspaceList', ['workspaces' => $workspaces]);
         // return Inertia::render('Workspaces/Index', ['workspaces' => $workspaces]);
     }
 
     public function store(Request $request)
     {
         $data = $request->validate(['name' => 'required|string|max:255']);
-        $request->user()->workspaces()->create($data);
+        $worksace = $request->user()->ownedWorkspaces()->create($data);
+
+        // assign the user to the workspace
+        $request->user()->workspaces()->attach($worksace);
         return redirect()->back()->with('success', 'Workspace created successfully.');
     }
 
@@ -42,6 +46,7 @@ class WorkspaceController extends Controller
     public function storeBoard(Request $request, Workspace $workspace)
     {
         $data = $request->validate(['name' => 'required|string|max:255']);
+        $data['created_by'] = $request->user()->id;
         $workspace->boards()->create($data);
         return redirect()->back()->with('success', 'Board created successfully.');
     }
@@ -49,6 +54,7 @@ class WorkspaceController extends Controller
 
     public function showWorkspaceBoard(Request $request,Workspace $workspace, Board $board)
     {
+        // dd('here');
         $board->load('tasks');
 
         $tasks = Task::with('assignees')->get();
@@ -56,6 +62,9 @@ class WorkspaceController extends Controller
         $task = Task::find($id);
         $activeTasks = Task::active()->get();
         $archivedTasks = Task::archived()->get();
+
+        // $workspace = Workspace::find($board->workspace_id);
+        // $board = Board::find($board->id);
 
 
         // dd($task);
@@ -69,12 +78,12 @@ class WorkspaceController extends Controller
         $assignees = User::all();
         // dd($tasks);
 
-        return Inertia::render('board/index', [
+        return Inertia::render('workspace/board/index', [
             'board' => $board,
             'workspace' => $workspace,
             'title' => 'Board Task Board',
             'description' => 'Attex React is a free and open-source admin dashboard template built with React and Tailwind CSS. It is designed to be easily customizable and includes a wide range of features and components to help you build your own dashboard quickly and efficiently.',
-            'tasks' => $board->tasks,
+            'tasks' => $board->tasks->load(['assignees']),
             'task' =>
             // Inertia::defer(
                 fn () => $request->has('task') ? $task?->load(['assignees','media','comments.user','comments.replies.user']) : null,

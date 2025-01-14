@@ -5,10 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Board;
 use App\Models\Task;
 use App\Models\User;
+use App\Models\Workspace;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
+
+use function Pest\Laravel\delete;
+
 class BoardTaskController extends Controller
 {
     public function index( Request $request)
@@ -19,11 +23,14 @@ class BoardTaskController extends Controller
         $activeTasks = Task::active()->get();
         $archivedTasks = Task::archived()->get();
         $assignees = User::all();
+        // $
         // dd($tasks);
         return Inertia::render('board/index', [
             'title' => 'Task Board',
             'description' => 'Attex React is a free and open-source admin dashboard template built with React and Tailwind CSS. It is designed to be easily customizable and includes a wide range of features and components to help you build your own dashboard quickly and efficiently.',
             'tasks' => $tasks,
+            //load task with comments where parent_id is null and replies
+
             'task' =>
             // Inertia::defer(
                 fn () => $request->has('task') ? $task?->load(['assignees','media','comments.user','comments.replies.user']) : null,
@@ -97,7 +104,7 @@ class BoardTaskController extends Controller
             ],
         ];
     }
-    public function store(Request $request, Board $board)
+    public function store(Request $request, Workspace $workspace, Board $board)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
@@ -133,7 +140,7 @@ class BoardTaskController extends Controller
         return redirect()->back()->with('success', 'Task created successfully.');
     }
 
-    public function updateTask(Request $request, Board $board, $id)
+    public function updateTask(Request $request,Workspace $workspace, Board $board, $id)
     {
         // dd($request->all());
         $validated = $request->validate([
@@ -164,7 +171,7 @@ class BoardTaskController extends Controller
         return redirect()->back()->with('success', 'Task updated successfully.');
     }
 
-    public function updateTasks(Request $request,Board $board)
+    public function updateTasks(Request $request,Workspace $workspace, Board $board)
     {
         $validated = $request->validate([
             'sourceId' => 'required|string',
@@ -210,8 +217,10 @@ class BoardTaskController extends Controller
     //     ];
     // }
 
-    public function destroy($id)
+    public function destroy(Request $request,Workspace $workspace, Board $board, $id)
     {
+
+        // dd($request->all());
         $task = Task::findOrFail($id);
 
         // Delete the task and its relationships in the pivot table
@@ -221,14 +230,15 @@ class BoardTaskController extends Controller
         // Redirect the user to the index page
         // route('boards.index');
 
-        return redirect()->route('boards.index')->with('success', 'Task deleted successfully.');
+
+        return redirect()->route('workspaces.board.show',['workspace' => $workspace->id, 'board' => $board->id ,'deleted' => $id])->with('success', 'Task deleted successfully.');
 
 
     }
 
 
 
-    public function deleteFile($mediaId)
+    public function deleteFile(Request $request,Workspace $workspace, Board $board,$mediaId)
     {
         $media = Media::findOrFail($mediaId);
 
@@ -238,13 +248,13 @@ class BoardTaskController extends Controller
         // return response()->json(['message' => 'File deleted successfully']);
     }
 
-    public function uploadFile(Request $request, $taskId)
+    public function uploadFile(Request $request,Workspace $workspace, Board $board, Task $task)
     {
         $request->validate([
             'file' => 'required|file|max:2048', // Adjust file validation rules as needed
         ]);
 
-        $task = Task::findOrFail($taskId);
+        // $task = Task::findOrFail($taskId);
 
         if ($request->hasFile('file')) {
             $task->addMedia($request->file('file'))->toMediaCollection('task_files');
@@ -254,13 +264,13 @@ class BoardTaskController extends Controller
         // return response()->json(['message' => 'File uploaded successfully', 'files' => $task->getMedia('task_files')]);
     }
 
-    public function uploadFiles(Request $request, $taskId)
+    public function uploadFiles(Request $request,Workspace $workspace, Board $board, Task $task)
     {
         $request->validate([
             'files.*' => 'required|file|max:2048', // Validate each file
         ]);
 
-        $task = Task::findOrFail($taskId);
+        // $task = Task::findOrFail($taskId);
 
         if ($request->hasFile('files')) {
             foreach ($request->file('files') as $file) {
@@ -276,7 +286,7 @@ class BoardTaskController extends Controller
     }
 
 
-    public function archive(Task $task)
+    public function archive(Request $request,Workspace $workspace, Board $board, Task $task)
     {
         // dd($task);
         $task->archive();
@@ -287,7 +297,7 @@ class BoardTaskController extends Controller
         // ]);
     }
 
-    public function unarchive(Task $task)
+    public function unarchive(Request $request,Workspace $workspace, Board $board,Task $task)
     {
         $task->unarchive();
         return redirect()->back()->with('success', 'Task unarchived successfully.');

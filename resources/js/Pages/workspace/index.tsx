@@ -1,30 +1,89 @@
-import { Link, usePage } from "@inertiajs/react";
+import { Link, useForm, usePage } from "@inertiajs/react";
 import { route } from 'vendor/tightenco/ziggy/src/js';
-import { PageBreadcrumb } from '../../components'
+// import VerticalLayout from '../../layouts/Vertical';
+import { FormInput, CustomDatepicker, PageBreadcrumb ,FileUploader} from '../../components'
 import VerticalLayout from '../../layouts/Vertical';
-// import { useForm } from '@inertiajs/react'
-// import { router } from '@inertiajs/react'
-import React, { useState } from 'react';
+import { ModalLayout } from '../../components/HeadlessUI'
+import { useState } from 'react';
 const WorkspaceDetails = () => {
-  const workspace = usePage().props?.workspace;
+  const workspace:any = usePage().props?.workspace;
   const props: any = {
     title: 'A Single Workspace',
     description: 'Single Workspace Details',
   }
+  const [newWorkSpaceModal, setNewWorkSpaceModal] = useState<boolean>(false);
+  const toggleNewWorkSpaceModal = () => {
+    setNewWorkSpaceModal((prevState) => !prevState);
+  };
+
+  const { data, setData, post, processing, reset, errors } = useForm({
+    name: '',
+  });
+
+  const handleNewWorkSpace = (e: React.FormEvent) => {
+    e.preventDefault();
+    post(route('workspaces.board.create',{workspace:workspace.id}), {
+      onSuccess: () => {
+        setNewWorkSpaceModal(false);
+        setData('name', '');
+      },
+    });
+  };
+
+
   return (
     <VerticalLayout {...props}>
         <div>
         <h1>{workspace.name}</h1>
         <h2>Task Boards</h2>
+        <button type="button" onClick={() => toggleNewWorkSpaceModal()} className="btn btn-primary">
+            Create New Task Board
+        </button>
         <ul>
-            {workspace.boards.map((board) => (
-            <Link href={`/workspaces/${workspace.id}/boards/${board.id}`} key={board.id}>
-                <li>{board.name}</li>
-            </Link>
+            {workspace.boards.map((board: any) => (
+                <Link href={`/workspaces/${workspace.id}/boards/${board.id}`} key={board.id}>
+                    <li>{board.name}</li>
+                </Link>
             ))}
         </ul>
         </div>
 
+        {/* Add New Task Board Modal */}
+        <ModalLayout showModal={newWorkSpaceModal} toggleModal={() => toggleNewWorkSpaceModal()} panelClassName="mt-8 rounded-none min-w-[768px]" aria-hidden="true">
+            <div className="duration-300 ease-in-out transition-all sm:max-w-3xl sm:w-full sm:mx-auto flex flex-col bg-white shadow-sm rounded dark:bg-gray-800">
+                <div className="flex justify-between items-center py-3 px-6 border-b dark:border-gray-700">
+                    <h3 className="font-medium text-gray-600 dark:text-white text-base">Create New Task Board</h3>
+                    <button className="inline-flex flex-shrink-0 justify-center items-center h-8 w-8 dark:text-gray-200" type="button" onClick={toggleNewWorkSpaceModal}>
+                        <i className="ri-close-line text-2xl" />
+                    </button>
+                </div>
+                <div className="py-3 px-6 overflow-y-auto">
+                    <form onSubmit={handleNewWorkSpace}>
+
+                        <div className="grid sm:grid-cols-12 gap-6">
+                            <div className="lg:col-span-12 sm:col-span-12">
+                                <FormInput name="name" label="" placeholder="Enter Name" type="text" containerClass="space-y-1.5 mb-6" className="form-input" key="title"  value={data.name} errors={errors} onChange={(e) => setData('name', e.target.value)} />
+                            </div>
+
+                        </div>
+
+
+                        <div className="flex justify-end items-center gap-2">
+                            {/* <button className="btn bg-light text-gray-800 transition-all dark:bg-gray-700 dark:text-gray-100" type="button" onClick={toggleNewTaskBoardModal}>
+                                Close
+                            </button> */}
+                            <button
+                                type="submit"
+                                disabled={processing}
+                                className="btn btn-primary w-full"
+                            >
+						                {processing ? 'Creating...' : 'Create'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </ModalLayout>
     </VerticalLayout>
   );
 };

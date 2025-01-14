@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { ListTaskItem } from '../pages/apps/Tasks/TasksList/data'
+import { ListTaskItem } from '../Pages/apps/Tasks/TasksList/data'
 
 export default function useTask(task: ListTaskItem) {
 	const [completed, setCompleted] = useState<boolean>(task.stage === 'Done')

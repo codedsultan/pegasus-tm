@@ -60,6 +60,13 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword 
     }
 
     protected $appends = ['avatar','fullname','avatar_img'];
+
+    protected function type(): Attribute
+    {
+        return new Attribute(
+            get: fn ($value) =>  ["user"][$value],
+        );
+    }
     public function avatar(): Attribute
     {
         return Attribute::get(fn () => CreateAvatar::run($this->first_name, $this->email, null, null, 'initials'));
@@ -100,5 +107,9 @@ class User extends Authenticatable implements MustVerifyEmail, CanResetPassword 
         return $this->belongsToMany(Workspace::class, 'user_workspace');
     }
 
+    public function ownedWorkspaces()
+    {
+        return $this->hasMany(Workspace::class, 'owner_id');
+    }
 
 }
