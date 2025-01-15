@@ -1,8 +1,13 @@
-import { MENU_ITEMS, MenuItemTypes } from '../constants/menu'
+import { MENU_ITEMS,ADMIN_MENU_ITEMS, MenuItemTypes } from '../constants/menu'
 
 const getMenuItems = () => {
 	// NOTE - You can fetch from server and return here as well
 	return MENU_ITEMS
+}
+
+const getAdminMenuItems = () => {
+	// NOTE - You can fetch from server and return here as well
+	return ADMIN_MENU_ITEMS
 }
 
 const findAllParent = (menuItems: MenuItemTypes[], menuItem: MenuItemTypes): string[] => {
@@ -31,4 +36,4 @@ const findMenuItem = (menuItems: MenuItemTypes[] | undefined, menuItemKey: MenuI
 	return null
 }
 
-export { getMenuItems, findAllParent, findMenuItem }
+export { getMenuItems, findAllParent, findMenuItem ,getAdminMenuItems}

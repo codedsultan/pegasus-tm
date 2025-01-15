@@ -7,6 +7,8 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\TaskController;
 use App\Http\Controllers\Admin\WorkspaceController;
 use App\Http\Controllers\Admin\BoardController;
+use App\Http\Controllers\Admin\PlanController;
+use App\Http\Controllers\Admin\SubscriptionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +28,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
             Route::resource('workspaces', WorkspaceController::class);
             Route::resource('boards', BoardController::class);
             Route::resource('tasks', TaskController::class);
+
+            Route::resource('plans', PlanController::class);
+            Route::resource('subscriptions', SubscriptionController::class);
+
         });
     // });
 });
