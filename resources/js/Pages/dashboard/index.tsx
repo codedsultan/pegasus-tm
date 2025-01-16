@@ -13,25 +13,25 @@ const Dashboard = () => {
     });
 
 
-    const handleInputChange = (e) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         setForm({
             ...form,
             [e.target.name]: e.target.value,
         });
     };
 
-    const handleFileChange = (e) => {
-        setForm({
-            ...form,
-            files: [...e.target.files], // Store the selected files as an array
-        });
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        // setForm({
+        //     ...form,
+        //     files: [...e.target.files], // Store the selected files as an array
+        // });
     };
 
-    const submit = (e) => {
+    const submit = (e: React.FormEvent) => {
         e.preventDefault();
 
         const formData = new FormData();
-        formData.append('title', form.title);
+        // formData.append('title', form.title);
         // formData.append('priority', form.priority);
 
         // Append each file
@@ -81,7 +81,7 @@ const Dashboard = () => {
 	return (
 		<>
             <VerticalLayout {...props}>
-			    <PageBreadcrumb title="Starter Page" subName="Pages" />
+			    {/* <PageBreadcrumb title="Starter Page" subName="Pages" />
 
 
 
@@ -94,7 +94,6 @@ const Dashboard = () => {
                     onChange={handleInputChange}
                 />
 
-                {/* <input type="text" value={data.name || ''} onChange={e => setData('name', e.target?.value)} /> */}
                 <input
                     type="file"
                     name="files[]"
@@ -102,14 +101,9 @@ const Dashboard = () => {
                     onChange={handleFileChange}
                 />
 
-                {/* <input type="file" onChange={e => {setData((data)=> ({...data, avatar: e.target?.files[0].name} ))}} /> */}
-                {/* {progress && (
-                <progress value={progress.percentage} max="100">
-                    {progress.percentage}%
-                </progress>
-                )} */}
+
                 <button type="submit">Submit</button>
-            </form>
+            </form> */}
 
             </VerticalLayout>
 		</>
