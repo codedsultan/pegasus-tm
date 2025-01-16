@@ -12,7 +12,7 @@ class WorkspaceController extends Controller
     public function index()
     {
         return Inertia::render('Admin/Workspaces/Index', [
-            'workspaces' => Workspace::all(),
+            'workspaces' => Workspace::with('owner')->get(),
         ]);
     }
 

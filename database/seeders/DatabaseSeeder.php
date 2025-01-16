@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
         ]);
             // [UserSeeder::class, 'configure']
 
+
         \App\Models\Admin::create([
             'name' => 'Admin',
             'email' => 'admin@example.com',
@@ -47,5 +48,48 @@ class DatabaseSeeder extends Seeder
             'email' => 'codesultan369@gmail.com',
             'password' => bcrypt('password'),
         ]);
+
+        \App\Models\Plan::create([
+            'name' => 'Basic',
+            'price' => 10,
+            'billing_cycle' => 1,
+            'status' => 'active',
+        ]);
+
+        \App\Models\Plan::create([
+            'name' => 'Premium',
+            'price' => 20,
+            'billing_cycle' => 3,
+            'status' => 'active',
+        ]);
+
+        \App\Models\Plan::create([
+            'name' => 'Enterprise',
+            'price' => 30,
+            'billing_cycle' => 6,
+            'status' => 'active',
+        ]);
+
+
+        \App\Models\Subscription::create([
+            'user_id' => 1,
+            'plan_id' => 1,
+            'status' => 'active',
+            'started_at' => now(),
+            'ended_at' => now()->addMonths(1),
+            'price' => 10,
+        ]);
+
+        \App\Models\Subscription::create([
+            'user_id' => 2,
+            'plan_id' => 2,
+            'status' => 'active',
+            'started_at' => now()->addMonths(1),
+            'ended_at' => now()->addMonths(2),
+            'price' => 20,
+        ]);
+
+
+
     }
 }

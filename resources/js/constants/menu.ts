@@ -79,6 +79,13 @@ const ADMIN_MENU_ITEMS: MenuItemTypes[] = [
 		icon: 'ri-home-4-line'
     },
     {
+        key: 'users',
+        label: 'Users',
+        url: '/admin/users',
+        isTitle: false,
+		icon: 'ri-user-3-line',
+    },
+    {
         key: 'boards',
         label: 'Boards',
         url: '/admin/boards',
