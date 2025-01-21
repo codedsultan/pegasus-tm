@@ -36,7 +36,7 @@ class PlanController extends Controller
 
         Plan::create($request->all());
 
-        return redirect()->route('plans.index')->with('success', 'Plan created successfully.');
+        return redirect()->route('admin.plans.index')->with('success', 'Plan created successfully.');
     }
 
     public function edit($id)
@@ -59,7 +59,7 @@ class PlanController extends Controller
         $plan = Plan::findOrFail($id);
         $plan->update($request->all());
 
-        return redirect()->route('plans.index')->with('success', 'Plan updated successfully.');
+        return redirect()->route('admin.plans.index')->with('success', 'Plan updated successfully.');
     }
 
     public function destroy($id)
@@ -67,6 +67,6 @@ class PlanController extends Controller
         $plan = Plan::findOrFail($id);
         $plan->delete();
 
-        return redirect()->route('plans.index')->with('success', 'Plan deleted successfully.');
+        return redirect()->route('admin.plans.index')->with('success', 'Plan deleted successfully.');
     }
 }

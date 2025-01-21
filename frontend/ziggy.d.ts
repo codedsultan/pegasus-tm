@@ -241,19 +241,11 @@ declare module 'ziggy-js' {
     "admin.dashboard": [],
     "admin.logout": [],
     "admin.users.index": [],
-    "admin.users.create": [],
     "admin.users.store": [],
     "admin.users.show": [
         {
             "name": "user",
             "required": true
-        }
-    ],
-    "admin.users.edit": [
-        {
-            "name": "user",
-            "required": true,
-            "binding": "id"
         }
     ],
     "admin.users.update": [
@@ -301,19 +293,11 @@ declare module 'ziggy-js' {
         }
     ],
     "admin.boards.index": [],
-    "admin.boards.create": [],
     "admin.boards.store": [],
     "admin.boards.show": [
         {
             "name": "board",
             "required": true
-        }
-    ],
-    "admin.boards.edit": [
-        {
-            "name": "board",
-            "required": true,
-            "binding": "id"
         }
     ],
     "admin.boards.update": [
@@ -331,19 +315,11 @@ declare module 'ziggy-js' {
         }
     ],
     "admin.tasks.index": [],
-    "admin.tasks.create": [],
     "admin.tasks.store": [],
     "admin.tasks.show": [
         {
             "name": "task",
             "required": true
-        }
-    ],
-    "admin.tasks.edit": [
-        {
-            "name": "task",
-            "required": true,
-            "binding": "id"
         }
     ],
     "admin.tasks.update": [
@@ -361,15 +337,8 @@ declare module 'ziggy-js' {
         }
     ],
     "admin.plans.index": [],
-    "admin.plans.create": [],
     "admin.plans.store": [],
     "admin.plans.show": [
-        {
-            "name": "plan",
-            "required": true
-        }
-    ],
-    "admin.plans.edit": [
         {
             "name": "plan",
             "required": true
@@ -388,15 +357,8 @@ declare module 'ziggy-js' {
         }
     ],
     "admin.subscriptions.index": [],
-    "admin.subscriptions.create": [],
     "admin.subscriptions.store": [],
     "admin.subscriptions.show": [
-        {
-            "name": "subscription",
-            "required": true
-        }
-    ],
-    "admin.subscriptions.edit": [
         {
             "name": "subscription",
             "required": true

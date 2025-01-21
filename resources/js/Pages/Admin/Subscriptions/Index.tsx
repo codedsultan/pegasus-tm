@@ -1,12 +1,20 @@
 import React from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import VerticalLayout from '../../../layouts/AdminVertical';
+import { route } from 'vendor/tightenco/ziggy/src/js';
 const SubscriptionsIndex = () => {
     const  subscriptions:any  = usePage().props.subscriptions;
     const props: any = {
         title: 'Subscriptions',
         description: 'Manage your subscriptions',
     }
+    const handleDelete = (subscriptionId:any) => {
+        router.delete(route('admin.subscriptions.destroy',{subscription:subscriptionId}), {
+            onSuccess: () => {
+                console.log('Subscription deleted successfully');
+            },
+        });
+    };
 
     const Table = () => {
         return (
@@ -50,12 +58,15 @@ const SubscriptionsIndex = () => {
                                                     <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-200">{subscription.ended_at || 'N/A'}</td>
                                                     <td className="px-4 py-4">
                                                         <div className="flex items-center justify-start space-x-3">
-                                                            <Link href="">
-                                                                <i className="ri-settings-3-line text-base"></i>
+                                                            <Link href={`/admin/subscriptions/${subscription.id}/edit`}>
+                                                                <i className="ri-edit-2-line text-base"></i>
                                                             </Link>
-                                                            <Link href="">
+                                                            <button
+                                                                onClick={() => handleDelete(subscription.id)}
+                                                                className="text-red-500 hover:text-red-700 dark:text-red-500 dark:hover:text-red-700"
+                                                            >
                                                                 <i className="ri-delete-bin-2-line text-base"></i>
-                                                            </Link>
+                                                            </button>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -75,7 +86,7 @@ const SubscriptionsIndex = () => {
             <VerticalLayout {...props}>
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Subscriptions</h1>
-                    <Link href="/subscriptions/create" className="btn btn-primary">
+                    <Link href="/admin/subscription/create" className="btn btn-primary">
                         Add Subscription
                     </Link>
                 </div>
