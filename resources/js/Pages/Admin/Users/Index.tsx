@@ -1,6 +1,7 @@
 import React from 'react';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import VerticalLayout from '../../../layouts/AdminVertical';
+import { route } from 'vendor/tightenco/ziggy/src/js';
 const Index = () => {
     const users:any = usePage().props?.users;
     const props: any = {
@@ -50,14 +51,15 @@ const Index = () => {
                                                     <td className="px-4 py-4">
                                                         <div className="flex items-center justify-start space-x-3">
                                                             <Link href={`/admin/users/${user.id}/edit`}>
-                                                                <i className="ri-settings-3-line text-base"></i>
+                                                                <i className="ri-edit-2-line text-base"></i>
                                                             </Link>
-                                                            <Link as="button"
-                                                                method="delete"
-                                                                href={`/admin/users/${user.id}`}
+
+                                                            <button
+                                                                onClick={() => handleDelete(user.id)}
+                                                                className="text-red-500 hover:text-red-700 dark:text-red-500 dark:hover:text-red-700"
                                                             >
                                                                 <i className="ri-delete-bin-2-line text-base"></i>
-                                                            </Link>
+                                                            </button>
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -72,13 +74,21 @@ const Index = () => {
             </div>
         )
     }
+
+    const handleDelete = (userId:any) => {
+            router.delete(route('admin.users.destroy',{user:userId}), {
+                onSuccess: () => {
+                    console.log('User deleted successfully');
+                },
+            });
+    };
     return (
         <VerticalLayout {...props}>
         <div>
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold text-gray-800 dark:text-white">Users</h1>
-                <Link href="/admin/users/create" className="btn btn-primary">
-                    Create Workspace
+                <Link href="/admin/user/create" className="btn btn-primary">
+                    Create User
                 </Link>
             </div>
 

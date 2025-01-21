@@ -42,7 +42,7 @@ class SubscriptionController extends Controller
 
         Subscription::create($request->all());
 
-        return redirect()->route('subscriptions.index')->with('success', 'Subscription created successfully.');
+        return redirect()->route('admin.subscriptions.index')->with('success', 'Subscription created successfully.');
     }
 
     public function edit($id)
@@ -71,7 +71,7 @@ class SubscriptionController extends Controller
         $subscription = Subscription::findOrFail($id);
         $subscription->update($request->all());
 
-        return redirect()->route('subscriptions.index')->with('success', 'Subscription updated successfully.');
+        return redirect()->route('admin.subscriptions.index')->with('success', 'Subscription updated successfully.');
     }
 
     public function destroy($id)
@@ -79,6 +79,6 @@ class SubscriptionController extends Controller
         $subscription = Subscription::findOrFail($id);
         $subscription->delete();
 
-        return redirect()->route('subscriptions.index')->with('success', 'Subscription deleted successfully.');
+        return redirect()->route('admin.subscriptions.index')->with('success', 'Subscription deleted successfully.');
     }
 }

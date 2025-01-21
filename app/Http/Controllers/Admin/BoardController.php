@@ -14,7 +14,7 @@ class BoardController extends Controller
     public function index()
     {
         // Fetch all boards with their related workspace data (optional, depends on your requirements)
-        $boards = Board::with('workspace')->get();
+        $boards = Board::with('workspace.owner')->get();
 
         // Return boards data to the Inertia view
         return Inertia::render('Admin/Boards/Index', [
@@ -38,6 +38,7 @@ class BoardController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'description' => 'nullable|string|max:1000',
             'workspace_id' => 'required|exists:workspaces,id',  // Ensures the workspace exists
         ]);
 
@@ -65,7 +66,8 @@ class BoardController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'workspace_id' => 'required|exists:workspaces,id',  // Ensures the workspace exists
+            // 'workspace_id' => 'required|exists:workspaces,id',  // Ensures the workspace exists
+            'description' => 'nullable|string|max:1000',
         ]);
 
         // Update the board with the new data
